@@ -4,12 +4,14 @@
 
 ### Added
 - English-first README with a Chinese guide, local system-language UI adaptation, and a source-first public release workflow.
+- Current English and Chinese interface previews captured from isolated synthetic demo data.
 - Public safety checks and explicit documentation for privacy boundaries, third-party licenses, contribution rules, security reports, and release gates.
 - Separate Windows PyInstaller configuration so Windows builds do not reuse the macOS application bundle configuration.
 - macOS desktop language detection now prioritizes the native ordered language list, with Qt and environment values as fallbacks; `zh-Hans-US` remains Chinese under `C.UTF-8`.
 - Dependency verification refreshed the local build environment to FastAPI 0.141.1, Uvicorn 0.52.1, Pydantic 2.13.4, Pillow 12.3.0, pywebview 6.2.1, and PyInstaller 6.22.0 within the declared ranges.
 
 ### Fixed
+- Dynamic interface text now follows the selected locale, including scan modes, file counts, version labels, cleanup decisions, and runtime notifications.
 - Removed the unlicensed reference-code directory from the publishable Git index while leaving the local working copy untouched.
 - Removed absolute local paths from batch AI path-suggestion prompts; directory IDs are resolved back to local paths only on the local machine.
 - Fixed the public license attribution so the standalone project no longer carries the earlier reference project's copyright line.

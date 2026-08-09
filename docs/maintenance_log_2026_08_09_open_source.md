@@ -28,6 +28,7 @@
 - 标签发布不再自动启动 Windows 构建；Windows 仅在手动工作流中显式勾选并完成目标系统验证后运行，避免取消或未验证的 Windows 任务把公开提交标成红叉。
 - 补充开发协作说明：项目主要基于 OpenAI Codex 完成，其他 AI Agent 协助专项实现、审查、测试、文档和发布核验；关键变更与安全门槛仍由人工确认。
 - GitHub Actions 的 checkout/setup-python 升级到 Node.js 24 运行时版本，消除旧 Node.js 20 弃用警告。
+- 补充中英文 README 界面预览，截图来自隔离演示目录和合成文件名；同时修复动态渲染文案未完整跟随英文 locale 的问题。
 - 强化 `.gitignore` 和公开安全扫描，明确排除 `.zshrc`、Hermes/Pi/ZCode/Codex 配置、HF/API Token、`.env`、密钥、日志、数据库、模型和 KV/cache。
 
 ## 发布前门槛

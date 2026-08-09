@@ -14,6 +14,20 @@ English first: [README.md](README.md)
 
 默认面向应用/安装包管理，也可以新增文档、资料、压缩包等文件分类。软件包只是文件类型之一。
 
+![File Organizer 中文扫描与匹配界面，使用合成演示文件](docs/images/file-organizer-scan-zh.jpg)
+
+<p align="center"><sub>当前源码的实际运行界面，使用隔离演示目录和合成文件名；不包含真实项目、本机路径、API Key 或业务内容。</sub></p>
+
+## 界面预览
+
+### 清理计划
+
+![File Organizer 中文清理计划与保留策略](docs/images/file-organizer-cleanup-zh.jpg)
+
+### 文件格式设置
+
+![File Organizer 中文文件格式设置](docs/images/file-organizer-formats-zh.jpg)
+
 项目采用源码优先的开源方式，核心代码使用 MIT License。AI 是可选增强，中文系统显示中文界面，其他系统默认显示英文界面。安全边界、依赖许可和发布流程见 [SECURITY.md](SECURITY.md)、[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 和 [RELEASING.md](RELEASING.md)。
 
 ## ✨ 核心功能

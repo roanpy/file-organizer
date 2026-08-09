@@ -5,6 +5,8 @@
         '生成清理计划': 'Build Cleanup Plan',
         '批量入库整理': 'Organize Files',
         '执行清理计划': 'Run Cleanup Plan',
+        '已开启 AI 智能辅助': 'AI assistance enabled',
+        '已关闭 AI (如需 AI 智能辅助请开启)': 'AI is off (turn it on for assistance)',
         '总数': 'Total',
         '源目录': 'Source',
         '目标目录': 'Target',
@@ -12,7 +14,12 @@
         '分组': 'Groups',
         '整理模式': 'Organize Mode',
         '清理模式': 'Cleanup Mode',
+        '入库模式': 'Organize Mode',
+        '清理计划': 'Cleanup Plan',
         '点击 "文件入库扫描" 开始智能分组': 'Click "Scan Inbox" to start grouping',
+        '提示：开启右上角 AI 开关可获得更精准的智能分组建议': 'Tip: turn on the AI switch for more accurate grouping suggestions',
+        '规则匹配完成！找到 ': 'Local rules matched ',
+        ' 个匹配组': ' groups',
         '正在扫描重复文件...': 'Scanning for duplicate files...',
         '等待入库分析': 'Waiting for an inbox scan',
         '点击顶部 "文件入库扫描" 按钮，将源目录文件与目标目录智能匹配分组': 'Click "Scan Inbox" above to match source files with the target library',
@@ -78,6 +85,16 @@
         '删除': 'Delete',
         '跳过': 'Skip',
         '保留': 'Keep',
+        '将替换/删除': 'Replace/Delete',
+        '已保护': 'Protected',
+        '可清理': 'Cleanable',
+        '1 个文件': '1 file',
+        '个文件': ' files',
+        '根目录': 'root',
+        '版本 ': 'Version ',
+        '默认：保留最近 ': 'Default: keep latest ',
+        '策略：保留最近 ': 'Policy: keep latest ',
+        '个版本': ' versions',
         '入库转移': 'Inbox transfers',
         '旧版清理': 'Old versions to clean',
         '受保护跳过': 'Protected skips',
@@ -147,6 +164,8 @@
         '分析失败': 'Analysis failed',
         '分析完成': 'Analysis complete',
         '清理计划已生成': 'Cleanup plan generated',
+        '，重新生成清理计划后生效': '; effective after rebuilding the cleanup plan',
+        '个文件未选择目标目录，不会被转移': ' files have no target folder and will not be transferred',
         '清理分析失败': 'Cleanup analysis failed',
         'AI 分析完成': 'AI analysis complete',
         '已加载': 'Loaded',
@@ -218,6 +237,7 @@
                 if (mutation.type === 'characterData') translateRoot(mutation.target.parentElement || document.body);
                 if (mutation.type === 'childList') mutation.addedNodes.forEach(node => {
                     if (node.nodeType === Node.ELEMENT_NODE) translateRoot(node);
+                    if (node.nodeType === Node.TEXT_NODE) node.nodeValue = translate(node.nodeValue);
                 });
                 if (mutation.type === 'attributes') {
                     const current = mutation.target.getAttribute(mutation.attributeName);

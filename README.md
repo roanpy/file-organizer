@@ -12,6 +12,20 @@ Local-first file, document, and software-package organizer for macOS and Windows
 
 English is the primary project language. The UI selects Chinese for `zh-*` system locales and English for other system locales; no translation service or external CDN is used. 中文说明见 [README.zh-CN.md](README.zh-CN.md)。
 
+![File Organizer English scan and matching workspace using synthetic demo files](docs/images/file-organizer-scan-en.jpg)
+
+<p align="center"><sub>Actual UI from the current source tree with an isolated demo directory and synthetic filenames. No real project, local path, API key, or business content is shown.</sub></p>
+
+## Interface Preview
+
+### Cleanup Plan
+
+![File Organizer English cleanup plan with retention policy](docs/images/file-organizer-cleanup-en.jpg)
+
+### File Format Settings
+
+![File Organizer English file format settings](docs/images/file-organizer-formats-en.jpg)
+
 ## What It Does
 
 - Scans an inbox recursively and groups files by category, name, version, and date.
