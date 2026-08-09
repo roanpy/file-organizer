@@ -26,6 +26,7 @@
 - 修正桌面语言检测：macOS 优先读取 `AppleLanguages`，Qt 和环境变量只作跨平台兜底；增加 `zh-Hans-US + C.UTF-8` 回归测试，避免 Qt 只返回 `C` 时误显示英文。
 - macOS 打包核验成功，产物签名校验通过，当前本地直接依赖已更新并验证为 FastAPI 0.141.1、Uvicorn 0.52.1、Pydantic 2.13.4、Pillow 12.3.0、pywebview 6.2.1 和 PyInstaller 6.22.0；未发现直接依赖仍有可用更新。
 - 标签发布不再自动启动 Windows 构建；Windows 仅在手动工作流中显式勾选并完成目标系统验证后运行，避免取消或未验证的 Windows 任务把公开提交标成红叉。
+- 补充开发协作说明：项目主要基于 OpenAI Codex 完成，其他 AI Agent 协助专项实现、审查、测试、文档和发布核验；关键变更与安全门槛仍由人工确认。
 - 强化 `.gitignore` 和公开安全扫描，明确排除 `.zshrc`、Hermes/Pi/ZCode/Codex 配置、HF/API Token、`.env`、密钥、日志、数据库、模型和 KV/cache。
 
 ## 发布前门槛

@@ -48,6 +48,10 @@ File Organizer is a local file-management tool, not a cloud storage service or a
 
 Transfers and cleanup require user confirmation. Same-name targets are not overwritten unless the confirmation dialog explicitly enables overwrite. File operations are restricted to configured source and target roots.
 
+## Development Assistance
+
+This project was developed primarily with OpenAI Codex. Other AI coding agents and local agent workflows assisted with focused implementation, review, testing, documentation, and release checks. Code changes, dependency choices, security checks, and destructive operations remain subject to human review.
+
 ## Quick Start
 
 Requirements: Python 3.10+ and a local macOS or Windows environment.

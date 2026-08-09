@@ -14,6 +14,10 @@ python -m pip install -r requirements.txt
 
 The core application does not require Gemini, DeepSeek, Ollama, or LiteLLM SDKs. Use synthetic temporary directories for tests. Never commit real paths, provider keys, runtime logs, databases, or downloaded packages.
 
+## AI-Assisted Development
+
+The project is developed primarily with OpenAI Codex, with other AI coding agents and local agent workflows used for focused implementation, review, testing, documentation, and release checks. AI assistance does not replace human review: contributors must inspect changes, run the required checks, and confirm security and file-operation behavior before merging.
+
 ## Required Checks
 
 ```bash
