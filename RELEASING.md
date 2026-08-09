@@ -15,7 +15,7 @@
 
 ## Windows Application
 
-Windows uses `SoftwareOrganizer.windows.spec` and produces `dist/FileOrganizer/FileOrganizer.exe`. Sign the executable before presenting it as a trusted public download.
+Windows uses `SoftwareOrganizer.windows.spec` and produces `dist/FileOrganizer/FileOrganizer.exe`. The GitHub Windows job is manual-only and remains skipped for version tags; run it only with the explicit `build_windows` input after validation on a real Windows target. Sign the executable before presenting it as a trusted public download.
 
 ## Release Gate
 

@@ -8,9 +8,16 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      build_windows:
+        description: 'Build Windows only after target-system validation'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build-windows:
+    if: github.event_name == 'workflow_dispatch' && inputs.build_windows == true
     runs-on: windows-latest
     
     steps:

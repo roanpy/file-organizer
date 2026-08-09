@@ -2,6 +2,14 @@
 
 Local-first file, document, and software-package organizer for macOS and Windows.
 
+[![Checks](https://github.com/roanpy/file-organizer/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/roanpy/file-organizer/actions/workflows/ci.yml)
+[![Status](https://img.shields.io/badge/status-source%20stable-2ea043.svg)](CHANGELOG.md)
+[![Binaries](https://img.shields.io/badge/binaries-signing%20%26%20license%20gated-d97706.svg)](RELEASING.md)
+[![Version](https://img.shields.io/github/v/tag/roanpy/file-organizer?label=version&sort=semver)](https://github.com/roanpy/file-organizer/tags)
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-555555.svg)](RELEASING.md)
+[![License](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
+
 English is the primary project language. The UI selects Chinese for `zh-*` system locales and English for other system locales; no translation service or external CDN is used. 中文说明见 [README.zh-CN.md](README.zh-CN.md)。
 
 ## What It Does
