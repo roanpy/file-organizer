@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Organizer Pro</title>
+    <!-- Local Fonts & Icons -->
+    <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css?v=16">
+    <link rel="stylesheet" href="/static/ai_styles.css">
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+</head>
+
+<body>
+    <div id="app">
+        <header class="glass-header">
+            <div class="logo">
+                <i class="fa-solid fa-hard-drive"></i>
+                <span>File Organizer <span class="highlight">Pro</span></span>
+            </div>
+            <div class="actions">
+
+                <!-- AI Toggle Button (Pill Style) -->
+                <div id="ai-toggle-btn" class="ai-toggle-btn" title="开启/关闭 AI 智能分析">
+                    <div class="toggle-track">
+                        <span class="toggle-label">AI</span>
+                        <div class="toggle-handle"></div>
+                    </div>
+                </div>
+
+                <button id="analyze-btn" class="btn-primary-style" onclick="inputManagement()">
+                    <i class="fa-solid fa-inbox"></i> <span>文件入库扫描</span>
+                </button>
+                <button id="dedupe-btn" class="btn-warning-style" onclick="deduplicateFiles()">
+                    <i class="fa-solid fa-broom"></i> <span>生成清理计划</span>
+                </button>
+                <button id="process-btn" class="btn-success-style" onclick="batchProcess()">
+                    <i class="fa-solid fa-play"></i> <span>批量入库整理</span>
+                </button>
+
+                <span class="header-divider"></span>
+
+                <!-- AI 模型选择 -->
+                <div class="dropdown" id="engine-dropdown-container">
+                    <button class="btn-icon btn-labeled dropdown-toggle" id="engine-dropdown-btn" title="选择 AI 模型">
+                        <span id="current-engine-label"
+                            style="display: inline; visibility: visible; color: inherit;">Gemini</span>
+                        <span id="current-engine-status" class="status-dot" title="未检查"></span>
+                        <i class="fa-solid fa-caret-down dropdown-caret"></i>
+                    </button>
+                    <input type="hidden" id="engine-select" value="gemini">
+                    <div class="dropdown-menu" id="engine-dropdown-menu">
+                        <div class="dropdown-item" data-value="gemini">
+                            <i class="fa-brands fa-google"></i> Gemini
+                            <span class="dropdown-status-dot status-dot" id="dropdown-dot-gemini"></span>
+                        </div>
+                        <div class="dropdown-item" data-value="deepseek">
+                            <i class="fa-solid fa-brain"></i> DeepSeek
+                            <span class="dropdown-status-dot status-dot" id="dropdown-dot-deepseek"></span>
+                        </div>
+                        <div class="dropdown-item" data-value="ollama">
+                            <i class="fa-solid fa-laptop-code"></i> Ollama
+                            <span class="dropdown-status-dot status-dot" id="dropdown-dot-ollama"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <span class="header-divider"></span>
+
+                <button id="settings-btn" class="btn-icon-only has-tooltip" data-tooltip="设置" aria-label="打开设置">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <button id="refresh-btn" class="btn-icon-only has-tooltip" data-tooltip="刷新" aria-label="刷新文件列表">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <button id="history-btn" class="btn-icon-only has-tooltip" data-tooltip="历史" aria-label="查看操作历史">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+                <button id="help-btn" class="btn-icon-only has-tooltip" data-tooltip="帮助" aria-label="打开使用说明">
+                    <i class="fa-solid fa-circle-question"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main-content glass-panel">
+            <!-- 统计栏 -->
+            <div class="stats-header">
+                <div class="stats-info">
+                    <span class="stat-item">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span id="stat-total">0</span> 总数
+                    </span>
+                    <span class="stat-item">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span id="stat-source">0</span> 源目录
+                    </span>
+                    <span class="stat-item">
+                        <i class="fa-solid fa-folder-tree"></i>
+                        <span id="stat-target">0</span> 目标目录
+                    </span>
+                    <span class="stat-item">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span id="stat-configs">0</span> 配置路径
+                    </span>
+                    <span class="stat-item">
+                        <i class="fa-solid fa-object-group"></i>
+                        <span id="stat-groups">0</span> 分组
+                    </span>
+                    <!-- 模式指示器 -->
+                    <span class="stat-item mode-indicator" id="mode-indicator" style="display: none;">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <span id="mode-label">整理模式</span>
+                    </span>
+                </div>
+                <div class="analyze-hint" id="analyze-hint">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    点击 "文件入库扫描" 开始智能分组
+                </div>
+            </div>
+
+            <!-- 分组列表区域 -->
+            <div id="groups-container" class="groups-container">
+                <div id="loading-state" class="loading-state hidden">
+                    <div class="spinner"></div>
+                    <p>正在扫描重复文件...</p>
+                </div>
+                <div id="empty-state" class="empty-state">
+                    <i class="fa-solid fa-inbox"></i>
+                    <p>等待入库分析</p>
+                    <p class="hint">点击顶部 "文件入库扫描" 按钮，将源目录文件与目标目录智能匹配分组</p>
+                </div>
+                <div id="groups-list" class="groups-list hidden">
+                    <!-- 分组将在这里渲染 -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+            <div class="modal-content glass-panel">
+                <div class="modal-header">
+                    <h3 id="settings-title">系统设置</h3>
+                    <button id="close-settings" class="btn-close" aria-label="关闭设置"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-tabs">
+                        <button id="btn-tab-general" class="tab-btn active">通用设置</button>
+                        <button id="btn-tab-formats" class="tab-btn">文件格式</button>
+                        <button id="btn-tab-cleanup" class="tab-btn">清理策略</button>
+                        <button id="btn-tab-models" class="tab-btn">AI 模型</button>
+                    </div>
+
+                    <div id="tab-general" class="tab-content active">
+                        <div class="form-group">
+                            <label>源目录 (扫描目录)</label>
+                            <div class="input-group">
+                                <input type="text" id="cfg-source" placeholder="例如: ~/Downloads">
+                                <button type="button" class="btn-secondary"
+                                    onclick="openDirPicker('source')">浏览</button>
+                            </div>
+                        </div>
+                        <!-- 分类目标目录 - 动态生成 -->
+                        <div id="category-target-dirs">
+                            <!-- 将由 JavaScript 动态生成 -->
+                        </div>
+                    </div>
+
+                    <div id="tab-formats" class="tab-content hidden">
+                        <div class="category-header">
+                            <h4>文件分类管理</h4>
+                            <button type="button" class="btn-primary btn-sm" onclick="addNewCategory(event)">
+                                <i class="fa-solid fa-plus"></i> 新增分类
+                            </button>
+                        </div>
+                        <!-- 分类列表 - 动态生成 -->
+                        <div id="category-formats-list">
+                            <!-- 将由 JavaScript 动态生成 -->
+                        </div>
+                    </div>
+
+                    <div id="tab-cleanup" class="tab-content hidden">
+                        <div class="settings-section">
+                            <h4><i class="fa-solid fa-shield-halved"></i> 历史版本保留</h4>
+                            <div class="form-group">
+                                <label>默认保留最近版本数</label>
+                                <input type="number" id="retention-global-keep-latest" min="0" max="20" step="1"
+                                    placeholder="例如: 1">
+                                <p class="form-hint">用于没有单独策略的文件分组。填 0 表示不自动勾选最近版本。</p>
+                            </div>
+                            <div class="form-group">
+                                <label>排除清理关键词</label>
+                                <textarea id="retention-protected-keywords" rows="4"
+                                    placeholder="每行一个关键词，例如: LTS&#10;driver&#10;signed"></textarea>
+                                <p class="form-hint">文件名或分组名称包含这些关键词时，会在清理计划中受保护。</p>
+                            </div>
+                            <div class="form-group">
+                                <label>排除清理目录</label>
+                                <textarea id="retention-protected-directories" rows="4"
+                                    placeholder="每行一个完整目录，例如: ~/Archive/Drivers"></textarea>
+                                <p class="form-hint">位于这些目录下的文件不会进入批量清理队列。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-models" class="tab-content hidden">
+                        <div class="model-list">
+                            <!-- Gemini -->
+                            <div class="model-card" id="card-gemini">
+                                <div class="card-header">
+                                    <h4><i class="fa-brands fa-google"></i> Gemini <span id="status-dot-gemini"
+                                            class="status-dot" title="未检查"></span></h4>
+                                    <span class="status-badge" id="status-gemini">未配置</span>
+                                </div>
+                                <div class="card-body hidden" id="edit-gemini">
+                                    <div class="form-group">
+                                        <label>API Key</label>
+                                        <input type="password" id="cfg-gemini-key" placeholder="输入 API Key">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Model</label>
+                                        <select id="cfg-gemini-model">
+                                            <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                                            <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                                            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+                                            <option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
+                                        </select>
+                                    </div>
+                                    <div class="card-actions">
+                                        <button class="btn-secondary btn-sm" onclick="testConnection('gemini')">
+                                            <i class="fa-solid fa-plug"></i> 验证连接
+                                        </button>
+                                        <button class="btn-primary btn-sm"
+                                            onclick="saveModelConfig('gemini')">保存</button>
+                                    </div>
+                                    <div id="test-result-gemini" class="test-result hidden"></div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn-text" onclick="toggleEdit('gemini')">配置 / 修改</button>
+                                </div>
+                            </div>
+
+                            <!-- DeepSeek -->
+                            <div class="model-card" id="card-deepseek">
+                                <div class="card-header">
+                                    <h4><i class="fa-solid fa-brain"></i> DeepSeek <span id="status-dot-deepseek"
+                                            class="status-dot" title="未检查"></span></h4>
+                                    <span class="status-badge" id="status-deepseek">未配置</span>
+                                </div>
+                                <div class="card-body hidden" id="edit-deepseek">
+                                    <div class="form-group">
+                                        <label>API Key</label>
+                                        <input type="password" id="cfg-deepseek-key" placeholder="输入 API Key">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Model</label>
+                                        <select id="cfg-deepseek-model">
+                                            <option value="deepseek-v4-flash">deepseek-v4-flash</option>
+                                            <option value="deepseek-v4-pro">deepseek-v4-pro</option>
+                                            <option value="deepseek-chat">deepseek-chat</option>
+                                            <option value="deepseek-reasoner">deepseek-reasoner</option>
+                                        </select>
+                                    </div>
+                                    <div class="card-actions">
+                                        <button class="btn-secondary btn-sm" onclick="testConnection('deepseek')">
+                                            <i class="fa-solid fa-plug"></i> 验证连接
+                                        </button>
+                                        <button class="btn-primary btn-sm"
+                                            onclick="saveModelConfig('deepseek')">保存</button>
+                                    </div>
+                                    <div id="test-result-deepseek" class="test-result hidden"></div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn-text" onclick="toggleEdit('deepseek')">配置 / 修改</button>
+                                </div>
+                            </div>
+
+                            <!-- Ollama -->
+                            <div class="model-card" id="card-ollama">
+                                <div class="card-header">
+                                    <h4><i class="fa-solid fa-laptop-code"></i> Ollama (本地) <span id="status-dot-ollama"
+                                            class="status-dot" title="未检查"></span></h4>
+                                    <span class="status-badge" id="status-ollama">未配置</span>
+                                </div>
+                                <div class="card-body hidden" id="edit-ollama">
+                                    <div class="form-group">
+                                        <label>URL</label>
+                                        <input type="text" id="cfg-ollama-url" placeholder="http://127.0.0.1:11434">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Model</label>
+                                        <select id="cfg-ollama-model">
+                                            <option value="">请先验证连接</option>
+                                        </select>
+                                    </div>
+                                    <div class="card-actions">
+                                        <button class="btn-secondary btn-sm" onclick="testConnection('ollama')">
+                                            <i class="fa-solid fa-plug"></i> 验证连接
+                                        </button>
+                                        <button class="btn-primary btn-sm"
+                                            onclick="saveModelConfig('ollama')">保存</button>
+                                    </div>
+                                    <div id="test-result-ollama" class="test-result hidden"></div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn-text" onclick="toggleEdit('ollama')">配置 / 修改</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn-primary" onclick="saveSettings()">
+                        <i class="fa-solid fa-floppy-disk"></i> 保存设置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Modal -->
+        <div id="history-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="history-title">
+            <div class="modal-content glass-panel">
+                <div class="modal-header">
+                    <h3 id="history-title">操作历史</h3>
+                    <button id="close-history" class="btn-close" aria-label="关闭操作历史"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div id="history-list" class="history-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Directory Picker Modal -->
+        <div id="dir-picker-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dir-picker-title">
+            <div class="modal-content glass-panel">
+                <div class="modal-header">
+                    <h3 id="dir-picker-title">选择目录</h3>
+                    <button id="close-dir-picker" class="btn-close" aria-label="关闭目录选择"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="dir-path-bar">
+                        <span id="current-dir-path">/</span>
+                        <button class="btn-secondary btn-sm" onclick="goToParentDir()">
+                            <i class="fa-solid fa-arrow-up"></i> 上级
+                        </button>
+                    </div>
+                    <div id="dir-list" class="dir-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeDirPicker()">取消</button>
+                    <button class="btn-primary" onclick="selectCurrentDir()">选择当前目录</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Add Category Modal -->
+        <div id="add-category-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="add-category-title">
+            <div class="modal-content glass-panel">
+                <div class="modal-header">
+                    <h3 id="add-category-title">新增文件分类</h3>
+                    <button id="close-add-category" class="btn-close" aria-label="关闭新增分类"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>分类 ID (英文小写，无空格)</label>
+                        <input type="text" id="new-cat-id" placeholder="例如: android">
+                    </div>
+                    <div class="form-group">
+                        <label>分类名称</label>
+                        <input type="text" id="new-cat-name" placeholder="例如: 安卓应用">
+                    </div>
+                    <div class="form-group">
+                        <label>文件格式 (逗号分隔)</label>
+                        <input type="text" id="new-cat-formats" placeholder="例如: .apk, .xapk">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeAddCategoryModal()">取消</button>
+                    <button class="btn-primary" onclick="confirmAddCategory()">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+            <div class="modal-content glass-panel" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3 id="help-title"><i class="fa-solid fa-circle-question"></i> 使用说明</h3>
+                    <button id="close-help" class="btn-close" aria-label="关闭使用说明"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="help-section">
+                        <h4>📚 快速上手流程</h4>
+                        <ol>
+                            <li><strong>配置目录</strong>：点击右上角"设置"按钮，在"通用设置"中配置源目录（下载目录）和各分类的目标目录</li>
+                            <li><strong>配置 AI 模型</strong>：AI 是可选增强；不开启也能完成扫描、匹配、清理和转移</li>
+                            <li><strong>文件入库扫描</strong>：点击顶部"文件入库扫描"按钮，系统会按文件名、版本和分类进行智能分组</li>
+                            <li><strong>审核分组</strong>：在分组列表中查看每个文件/文档/软件包的不同版本，确认需要入库或保留的版本</li>
+                            <li><strong>执行处理</strong>：入库扫描时点击"批量入库整理"；清理计划中点击"执行清理计划"，执行前会再次确认</li>
+                        </ol>
+                    </div>
+
+                    <div class="help-section">
+                        <h4>🎯 核心功能说明</h4>
+                        <ul>
+                            <li><strong>文件入库扫描</strong>：智能识别同名文件、文档或软件包的不同版本，自动分组。支持识别版本号、平台信息等</li>
+                            <li><strong>生成清理计划</strong>：扫描目标目录中已有的历史版本，结合版本号、保留策略和 AI 建议生成可确认的清理方案</li>
+                            <li><strong>跨格式查重</strong>：支持忽略扩展名差异的去重（如将 .dmg 与 .pkg 视为同一组文件），可在设置中开启</li>
+                            <li><strong>保留策略</strong>：默认保留最新版本，也可以按分组设置"保留2版"或"永不清理"</li>
+                            <li><strong>手动保留规则</strong>：点击锁图标可标记特定版本"始终保留"，下次分析时自动应用</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h4>🧹 清理计划与历史版本</h4>
+                        <ul>
+                            <li><strong>默认策略</strong>：每组默认保留最新版本，其余旧版本列为可清理候选</li>
+                            <li><strong>保留2版</strong>：适合需要保留稳定版、回退版本或历史文档的分组</li>
+                            <li><strong>永不清理</strong>：适合驱动、系统工具、签名包、合同、归档资料等需要长期留档的分组</li>
+                            <li><strong>全局策略</strong>：在"设置" → "清理策略"中配置默认保留数、排除关键词和排除目录</li>
+                            <li><strong>AI 建议</strong>：只用于辅助判断，不会覆盖手动保留和受保护策略</li>
+                            <li><strong>转移失败保护</strong>：只要本轮存在转移失败或同名跳过，系统就不会继续执行旧版删除</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h4>📁 文件分类管理</h4>
+                        <ul>
+                            <li><strong>文档资料</strong>：.pdf, .docx, .xlsx, .pptx, .txt, .md, .epub - 常用文档格式</li>
+                            <li><strong>Mac 应用</strong>：.dmg, .pkg - macOS 安装包格式</li>
+                            <li><strong>iOS 应用</strong>：.ipa - iOS 应用包（需越狱或签名工具安装）</li>
+                            <li><strong>Windows 应用</strong>：.exe, .msi - Windows 安装包格式</li>
+                            <li><strong>自定义分类</strong>：在"设置"中可添加新分类，并配置是否启用"跨格式查重"开关</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h4>🚦 AI 模型状态指示灯</h4>
+                        <ul>
+                            <li><strong>🟢 绿色</strong>：模型连接正常，可正常使用</li>
+                            <li><strong>🔴 红色</strong>：模型连接失败或未配置</li>
+                            <li><strong>⚪ 灰色</strong>：尚未检查连接状态</li>
+                            <li><strong>检查时机</strong>：当前选中模型每 30 秒自动刷新；打开下拉菜单时刷新全部</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h4>🔐 本地配置与安全</h4>
+                        <ul>
+                            <li><strong>配置位置</strong>：用户配置保存在本机 <code>~/.software_organizer/</code>，不会写入项目仓库</li>
+                            <li><strong>密钥处理</strong>：设置页只显示已配置状态，后端接口不会把真实 API Key 原样返回给页面</li>
+                            <li><strong>文件权限</strong>：配置和规则文件采用原子写入，并限制为仅当前用户可读</li>
+                            <li><strong>依赖方式</strong>：Gemini、DeepSeek、Ollama 使用 HTTP 调用，打包版不强制携带额外 AI SDK</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h4>⚡ 批量入库整理说明</h4>
+                        <ul>
+                            <li><strong>转移操作</strong>：将源目录中勾选的文件移动到对应分类的目标目录 (支持覆盖旧版本)</li>
+                            <li><strong>清理操作</strong>：在清理计划中删除未受保护、未被勾选保留的旧版本；受保护版本不会进入删除队列</li>
+                            <li><strong>安全确认</strong>：执行前会显示转移、清理、受保护跳过、未选目标和待清理文件预览，确认后才会执行</li>
+                            <li><strong>安全边界</strong>：转移仅允许从已配置源目录进入已配置目标目录；清理仅允许操作已配置目标目录</li>
+                            <li><strong>变体保护</strong>：语言包、补丁和不同 CPU 架构分别成组，避免将配套文件当作旧版本删除</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h4>⌨️ 小技巧</h4>
+                        <ul>
+                            <li>使用分组头部的复选框可以"全选/取消全选"该组内所有文件</li>
+                            <li>点击目标路径下拉框可选择具体的子目录存放位置</li>
+                            <li>清理前先看"已保护"和"可清理"数量，确认没有误删历史版本</li>
+                            <li>手动保留规则基于文件名记忆，同一文件分组的不同版本可以分别设置</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shared Confirmation Modal -->
+        <div id="confirmation-modal" class="modal hidden" role="dialog" aria-modal="true"
+            aria-labelledby="confirmation-title" aria-describedby="confirmation-message">
+            <div class="modal-content glass-panel confirmation-modal">
+                <div class="modal-header">
+                    <h3 id="confirmation-title">请确认</h3>
+                    <button id="confirmation-close" class="btn-close" aria-label="关闭确认窗口">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmation-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirmation-cancel" class="btn-secondary">取消</button>
+                    <button id="confirmation-confirm" class="btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notification-container"></div>
+    </div>
+
+    <script src="/static/i18n.js?v=1"></script>
+    <script src="/static/app.js?v=19" type="module"></script>
+</body>
+
+</html>

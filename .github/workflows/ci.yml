@@ -1,0 +1,40 @@
+name: Checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Compile Python sources
+        run: python -m compileall -q src SoftwareOrganizer-Skill tests
+
+      - name: Check frontend syntax
+        run: node --check static/app.js
+
+      - name: Check public safety
+        run: python scripts/check_public_safety.py
+
+      - name: Check installed dependencies
+        run: python -m pip check

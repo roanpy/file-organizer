@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# 虚拟环境
+.venv/
+venv/
+ENV/
+.env
+*.env
+*.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Local agent, editor, cache, and test state
+.zshrc
+.zprofile
+.bash_history
+.hermes/
+.pi/
+.zcode/
+.codex/
+.cache/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 日志和数据库
+*.log
+*.db
+*.sqlite
+*.sqlite3
+server.pid
+releases/
+
+
+# 本地配置（不提交用户私有配置）
+software_organizer_config.json
+software_organizer_history.json
+keep_rules.json
+retention_rules.json
+ai_recommendations.json
+*.pid
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.gguf
+*.safetensors
+models/
+model_cache/
+kv_cache/
+
+# 构建产物
+*.app
+*.dmg
+*.pkg
