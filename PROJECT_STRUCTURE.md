@@ -8,11 +8,13 @@
 | `README.zh-CN.md` | 文档 | 中文使用与维护说明 |
 | `LICENSE` | 法律 | MIT 开源许可证 |
 | `SECURITY.md` / `CONTRIBUTING.md` | 文档 | 安全报告与贡献规则 |
+| `CODE_OF_CONDUCT.md` / `RELEASING.md` / `THIRD_PARTY_NOTICES.md` | 文档 | 行为准则、发布流程、第三方许可声明 |
 | `requirements.txt` | 配置 | Python 依赖 |
 | `SoftwareOrganizer.spec` | 配置 | macOS PyInstaller 配置，产物为 `FileOrganizer.app` |
 | `SoftwareOrganizer.windows.spec` | 配置 | Windows PyInstaller 配置，产物为 `FileOrganizer/FileOrganizer.exe` |
 | `SoftwareOrganizer-Skill/` | 目录 | **[新增]** 独立的 AI Agent Skill 模块，兼容 Claude Code/OpenClaw。 |
 | `docs/` | 目录 | 批量处理、维护过程、打包核验等说明文档 |
+| `.github/workflows/` | 目录 | GitHub Actions：提交检查与多平台构建 |
 
 ---
 
@@ -47,7 +49,10 @@
 | `app.js` | 前端业务逻辑 |
 | `i18n.js` | 根据系统语言在中文/英文之间适配界面 |
 | `style.css` | 样式表 |
+| `ai_styles.css` | AI 建议与状态样式 |
 | `favicon.png` | 网站图标 |
+| `icon.icns` | macOS 应用图标 |
+| `vendor/fontawesome/` | 本地打包的 Font Awesome Free 静态资源 |
 
 ---
 
@@ -57,6 +62,8 @@
 |------|------|
 | `start_web.sh` | 启动 Web 服务器 |
 | `build_standalone.sh` | 构建 macOS `.app` 应用 |
+| `build_windows.bat` | 构建 Windows 应用 |
+| `check_public_safety.py` | 公开仓库常见泄密模式扫描 |
 
 ---
 
@@ -81,6 +88,7 @@
 | 文件 | 描述 |
 |------|------|
 | `batch_processing_logic.md` | 入库整理、清理计划、保留策略处理逻辑 |
+| `images/` | 中英文界面预览截图（合成演示数据） |
 | `maintenance_log_2026_05_20.md` | 清理计划、安全加固、依赖打包与发布核验过程 |
 | `maintenance_log_2026_05_21.md` | 流程精细化优化、依赖核查与验证记录 |
 | `maintenance_log_2026_07_16.md` | 全面审查、文件安全、分组保护与发布核验记录 |

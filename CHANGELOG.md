@@ -6,6 +6,7 @@
 - English-first README with a Chinese guide, local system-language UI adaptation, and a source-first public release workflow.
 - Current English and Chinese interface previews captured from isolated synthetic demo data.
 - Public safety checks and explicit documentation for privacy boundaries, third-party licenses, contribution rules, security reports, and release gates.
+- Third-party notices now cover the PyObjC, bottle, proxy_tools, and typing_extensions runtime dependencies bundled by pywebview; the English README links to the AI agent skill guide.
 - Separate Windows PyInstaller configuration so Windows builds do not reuse the macOS application bundle configuration.
 - macOS desktop language detection now prioritizes the native ordered language list, with Qt and environment values as fallbacks; `zh-Hans-US` remains Chinese under `C.UTF-8`.
 - Dependency verification refreshed the local build environment to FastAPI 0.141.1, Uvicorn 0.52.1, Pydantic 2.13.4, Pillow 12.3.0, pywebview 6.2.1, and PyInstaller 6.22.0 within the declared ranges.

@@ -15,6 +15,14 @@ The exact supported dependency ranges are listed in `requirements.txt`.
 
 PyInstaller is a build-time dependency. The optional AI SDKs are not required by the core application and are not bundled by the standard spec.
 
+The macOS desktop build also bundles the runtime dependencies that `pywebview`
+installs automatically on macOS:
+
+- PyObjC core and frameworks (Cocoa, Quartz, Security, UniformTypeIdentifiers, WebKit): MIT License. <https://pypi.org/project/pyobjc/>
+- bottle: MIT License. <https://bottlepy.org/docs/stable/>
+- proxy_tools: MIT License. <https://pypi.org/project/proxy_tools/>
+- typing_extensions: Python Software Foundation License. <https://pypi.org/project/typing-extensions/>
+
 ## Font Awesome
 
 The local web assets under `static/vendor/fontawesome/` are Font Awesome Free 6.4.0:

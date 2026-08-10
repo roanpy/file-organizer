@@ -29,6 +29,7 @@
 - 补充开发协作说明：项目主要基于 OpenAI Codex 完成，其他 AI Agent 协助专项实现、审查、测试、文档和发布核验；关键变更与安全门槛仍由人工确认。
 - GitHub Actions 的 checkout/setup-python 升级到 Node.js 24 运行时版本，消除旧 Node.js 20 弃用警告。
 - 补充中英文 README 界面预览，截图来自隔离演示目录和合成文件名；同时修复动态渲染文案未完整跟随英文 locale 的问题。
+- 补齐 pywebview 在 macOS 打包时会带入的 PyObjC/bottle/proxy_tools/typing_extensions 第三方许可声明；英文 README 增加 AI Agent Skill 文档入口；项目结构文档同步新文件；设置仓库 Topics 并创建仅含源码的 `v1.5.0` GitHub Release。
 - 强化 `.gitignore` 和公开安全扫描，明确排除 `.zshrc`、Hermes/Pi/ZCode/Codex 配置、HF/API Token、`.env`、密钥、日志、数据库、模型和 KV/cache。
 
 ## 发布前门槛

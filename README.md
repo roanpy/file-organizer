@@ -114,6 +114,7 @@ Windows uses `scripts/build_windows.bat` and its platform-specific PyInstaller s
 - [Chinese guide](README.zh-CN.md)
 - [Project structure](PROJECT_STRUCTURE.md)
 - [Batch processing logic](docs/batch_processing_logic.md)
+- [AI agent skill](SoftwareOrganizer-Skill/README.md)
 - [Maintenance and open-source preparation log](docs/maintenance_log_2026_08_09_open_source.md)
 - [Changelog](CHANGELOG.md)
 
