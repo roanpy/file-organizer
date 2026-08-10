@@ -15,6 +15,7 @@
 - Dynamic interface text now follows the selected locale, including scan modes, file counts, version labels, cleanup decisions, and runtime notifications.
 - Removed the unlicensed reference-code directory from the publishable Git index while leaving the local working copy untouched.
 - Removed absolute local paths from batch AI path-suggestion prompts; directory IDs are resolved back to local paths only on the local machine.
+- `GET /api/ai-config` now recursively removes credential-shaped fields, so legacy or custom AI configuration cannot expose stored keys even if it contains them.
 - Fixed the public license attribution so the standalone project no longer carries the earlier reference project's copyright line.
 
 ### Release Boundary

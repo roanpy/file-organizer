@@ -88,6 +88,29 @@ def _is_masked_or_empty_secret(value: Any) -> bool:
     return not text or text == "****" or "..." in text
 
 
+_SENSITIVE_CONFIG_KEYS = {
+    "api_key",
+    "api_token",
+    "client_secret",
+    "password",
+    "secret",
+    "token",
+}
+
+
+def _redact_sensitive_config(value: Any) -> Any:
+    """Recursively remove credential-shaped fields from API responses."""
+    if isinstance(value, dict):
+        return {
+            key: _redact_sensitive_config(item)
+            for key, item in value.items()
+            if key.lower() not in _SENSITIVE_CONFIG_KEYS
+        }
+    if isinstance(value, list):
+        return [_redact_sensitive_config(item) for item in value]
+    return value
+
+
 def _redact_provider_config(config: Dict[str, Any]) -> Dict[str, Any]:
     public_config = dict(config or {})
     api_key = public_config.pop("api_key", "")
@@ -516,7 +539,7 @@ async def update_config(config_update: ConfigUpdate):
 @app.get("/api/ai-config")
 async def get_ai_config():
     """Get the AI configuration."""
-    return load_ai_config()
+    return _redact_sensitive_config(load_ai_config())
 
 
 @app.post("/api/ai-config")

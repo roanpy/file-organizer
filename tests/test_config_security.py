@@ -78,5 +78,26 @@ class ConfigSecurityTest(unittest.TestCase):
         self.assertTrue(status["deepseek"]["connected"])
 
 
+    def test_ai_config_endpoint_redacts_stored_credentials(self):
+        original_load_ai_config = server.load_ai_config
+        try:
+            server.load_ai_config = lambda: {
+                "api_key": "stored-secret",
+                "core_rules": {
+                    "token": "nested-secret",
+                    "keep": "visible",
+                },
+                "items": [{"password": "secret"}, "plain"],
+            }
+            result = asyncio.run(server.get_ai_config())
+        finally:
+            server.load_ai_config = original_load_ai_config
+
+        self.assertNotIn("api_key", result)
+        self.assertNotIn("token", result["core_rules"])
+        self.assertEqual(result["core_rules"]["keep"], "visible")
+        self.assertEqual(result["items"], [{}, "plain"])
+
+
 if __name__ == "__main__":
     unittest.main()
