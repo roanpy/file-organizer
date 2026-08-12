@@ -1,15 +1,15 @@
 # File Organizer Pro 依赖
 
 # Web 框架
-fastapi>=0.100.0,<1
-uvicorn>=0.23.0,<1
-pydantic>=2.0.0,<3
+fastapi>=0.141.1,<1
+uvicorn>=0.52.1,<1
+pydantic>=2.13.4,<3
 
 # AI 引擎（可选；Gemini/DeepSeek 已内置 HTTP 调用）
 # litellm>=1.0.0
 # tenacity>=8.2.0
 # ollama SDK not required; local Ollama calls use its HTTP API
 # 工具
-Pillow>=10.0.0,<13
-pywebview>=4.0.0,<7
-pyinstaller>=6.0.0,<7
+Pillow>=12.3.0,<13
+pywebview>=6.2.1,<7
+pyinstaller>=6.22.0,<7
