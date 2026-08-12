@@ -2,7 +2,7 @@
 
 # Web 框架
 fastapi>=0.100.0,<1
-uvicorn>=0.23.0,<1
+uvicorn>=0.52.1,<1
 pydantic>=2.0.0,<3
 
 # AI 引擎（可选；Gemini/DeepSeek 已内置 HTTP 调用）
