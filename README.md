@@ -1,13 +1,13 @@
 # File Organizer Pro
 
-Local-first file, document, and software-package organizer for macOS and Windows.
+Local-first file, document, and software-package organizer for macOS, with experimental Windows source support.
 
 [![Checks](https://github.com/roanpy/file-organizer/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/roanpy/file-organizer/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-source%20stable-2ea043.svg)](CHANGELOG.md)
 [![Binaries](https://img.shields.io/badge/binaries-signing%20%26%20license%20gated-d97706.svg)](RELEASING.md)
 [![Version](https://img.shields.io/github/v/tag/roanpy/file-organizer?label=version&sort=semver)](https://github.com/roanpy/file-organizer/releases)
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-555555.svg)](RELEASING.md)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20experimental-555555.svg)](RELEASING.md)
 [![License](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 
 English is the primary project language. The UI selects Chinese for `zh-*` system locales and English for other system locales; no translation service or external CDN is used. 中文说明见 [README.zh-CN.md](README.zh-CN.md)。
@@ -68,7 +68,7 @@ This project was developed primarily with OpenAI Codex. Other AI coding agents a
 
 ## Quick Start
 
-Requirements: Python 3.10+ and a local macOS or Windows environment.
+Requirements: Python 3.10+ on macOS. Windows source support is available but its packaged build has not yet completed real-device validation.
 
 ```bash
 git clone https://github.com/roanpy/file-organizer.git
@@ -91,6 +91,7 @@ Provider keys are stored locally, masked in API responses, and never included in
 
 ```bash
 python -m unittest discover -s tests -v
+python -m ruff check src tests scripts SoftwareOrganizer-Skill
 python -m compileall -q src SoftwareOrganizer-Skill tests
 node --check static/app.js
 node --check static/i18n.js
@@ -108,7 +109,7 @@ The macOS bundle is built with:
 ./scripts/build_standalone.sh
 ```
 
-Windows uses `scripts/build_windows.bat` and its platform-specific PyInstaller spec. The source repository is the primary distribution. Prebuilt applications should only be published after platform signing, dependency/license review, and artifact verification. See [RELEASING.md](RELEASING.md).
+Windows uses `scripts/build_windows.bat` and its platform-specific PyInstaller spec, but remains experimental until a packaged build is validated on a real Windows system. Current automated macOS artifacts are Apple Silicon (`arm64`) and ad-hoc signed; they are build evidence, not trusted public downloads. The source repository is the primary distribution. Prebuilt applications should only be published after platform signing, dependency/license review, and artifact verification. See [RELEASING.md](RELEASING.md).
 
 ## Documentation
 

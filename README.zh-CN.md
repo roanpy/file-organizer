@@ -5,7 +5,7 @@
 [![二进制发布](https://img.shields.io/badge/binaries-signing%20%26%20license%20gated-d97706.svg)](RELEASING.md)
 [![版本](https://img.shields.io/github/v/tag/roanpy/file-organizer?label=version&sort=semver)](https://github.com/roanpy/file-organizer/releases)
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![平台](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-555555.svg)](RELEASING.md)
+[![平台](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20experimental-555555.svg)](RELEASING.md)
 [![许可证](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
 
 English first: [README.md](README.md)
@@ -217,6 +217,7 @@ file-organizer/
 ```bash
 source .venv/bin/activate
 python -m unittest discover -s tests -v
+python -m ruff check src tests scripts SoftwareOrganizer-Skill
 ```
 
 ### 依赖核查
@@ -244,7 +245,7 @@ rm -rf /Applications/FileOrganizer.app /Applications/SoftwareOrganizer.app
 cp -R dist/FileOrganizer.app /Applications/
 ```
 
-### Windows 平台
+### Windows 平台（实验性）
 
 ```cmd
 REM 构建独立应用 (.exe)
@@ -253,7 +254,7 @@ scripts\build_windows.bat
 
 ### GitHub Actions
 
-本项目包含 GitHub Workflows，支持在 GitHub 上自动构建 Windows 和 Mac 应用。
+本项目包含 GitHub Workflows。Windows 打包任务仅允许手动触发，在真实 Windows 系统完成验收前不作为正式支持的公开安装包。当前自动生成的 macOS 制品为 Apple Silicon (`arm64`) 且仅使用 ad-hoc 签名，只用于构建核验，不作为受信任的公开下载。
 只需推送标签 (v*) 即可触发构建。
 
 ## 📝 许可证

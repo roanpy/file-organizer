@@ -3,7 +3,7 @@ REM ==========================================
 REM      File Organizer - Windows Build
 REM ==========================================
 REM
-REM Version: 1.0.0 (2025-01-19)
+REM Version: 1.5.1 (2026-08-12)
 REM Function: Build standalone Windows application (.exe)
 REM
 REM Usage:
@@ -43,7 +43,7 @@ call venv\Scripts\activate
 REM Install dependencies
 echo [INFO] Installing dependencies...
 python -m pip install --upgrade pip
-pip install --upgrade -r requirements.txt
+pip install --require-hashes -r requirements.lock
 
 REM Clean old build files
 echo [INFO] Cleaning old build files...
