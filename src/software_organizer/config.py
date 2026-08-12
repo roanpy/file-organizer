@@ -141,15 +141,27 @@ def ensure_private_file(path: str) -> None:
         pass
 
 
-for state_filename in (
+PRIVATE_STATE_FILENAMES = (
     "software_organizer_config.json",
     "software_organizer_history.json",
     "keep_rules.json",
     "retention_rules.json",
     "ai_recommendations.json",
     "software_organizer.db",
-):
-    ensure_private_file(os.path.join(APP_DIR, state_filename))
+    "app.log",
+    "main.log",
+    "server.log",
+    "skill-server.log",
+)
+
+
+def ensure_private_runtime_state(app_dir: str = APP_DIR) -> None:
+    """Restrict existing configuration, database, and log files to the owner."""
+    for state_filename in PRIVATE_STATE_FILENAMES:
+        ensure_private_file(os.path.join(app_dir, state_filename))
+
+
+ensure_private_runtime_state()
 
 
 def migrate_old_config(config: Dict[str, Any]) -> tuple[Dict[str, Any], bool]:

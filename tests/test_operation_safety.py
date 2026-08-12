@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi import HTTPException
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
@@ -13,6 +14,12 @@ import server
 
 
 class OperationSafetyTest(unittest.TestCase):
+    def test_local_api_rejects_untrusted_host_headers(self):
+        middleware = next(
+            item for item in server.app.user_middleware if item.cls is TrustedHostMiddleware
+        )
+        self.assertEqual(middleware.kwargs["allowed_hosts"], ["127.0.0.1", "localhost"])
+
     def test_path_boundary_rejects_prefix_and_relative_paths(self):
         self.assertTrue(server._is_path_within("/tmp/root/file.dmg", "/tmp/root"))
         self.assertFalse(server._is_path_within("/tmp/root-old/file.dmg", "/tmp/root"))

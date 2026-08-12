@@ -1,7 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 
-datas = [('static', 'static')]
+datas = [
+    ('static', 'static'),
+    ('LICENSE', '.'),
+    ('THIRD_PARTY_NOTICES.md', '.'),
+]
 binaries = []
 hiddenimports = [
     'pydantic',

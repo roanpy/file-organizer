@@ -6,7 +6,12 @@ import unittest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from software_organizer.config import ensure_private_file, get_default_config, write_json_file
+from software_organizer.config import (
+    ensure_private_file,
+    ensure_private_runtime_state,
+    get_default_config,
+    write_json_file,
+)
 
 
 class ConfigDefaultsTest(unittest.TestCase):
@@ -37,6 +42,21 @@ class ConfigDefaultsTest(unittest.TestCase):
             ensure_private_file(path)
 
             self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
+
+    def test_existing_runtime_logs_are_restricted(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            paths = [
+                os.path.join(tmpdir, name)
+                for name in ("app.log", "main.log", "server.log", "skill-server.log")
+            ]
+            for path in paths:
+                with open(path, "w", encoding="utf-8") as log_file:
+                    log_file.write("synthetic log")
+                os.chmod(path, 0o644)
+
+            ensure_private_runtime_state(tmpdir)
+
+            self.assertTrue(all(os.stat(path).st_mode & 0o777 == 0o600 for path in paths))
 
 
 if __name__ == "__main__":

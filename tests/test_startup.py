@@ -11,6 +11,19 @@ import main
 
 
 class StartupTest(unittest.TestCase):
+    def test_binary_specs_include_license_notices(self):
+        root = os.path.join(os.path.dirname(__file__), "..")
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(root, "static", "vendor", "fontawesome", "LICENSE.txt")
+            )
+        )
+        for spec_name in ("SoftwareOrganizer.spec", "SoftwareOrganizer.windows.spec"):
+            with open(os.path.join(root, spec_name), encoding="utf-8") as spec_file:
+                spec = spec_file.read()
+            self.assertIn("('LICENSE', '.')", spec)
+            self.assertIn("('THIRD_PARTY_NOTICES.md', '.')", spec)
+
     def test_packaged_log_is_private_and_rotates(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             handler = main._create_private_rotating_log_handler(temp_dir)

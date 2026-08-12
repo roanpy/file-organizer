@@ -171,9 +171,10 @@ Gemini、DeepSeek 和 Ollama 均通过 HTTP API 调用，打包版不需要额�
 - `~/.software_organizer/software_organizer_history.json`
 - `~/.software_organizer/keep_rules.json`
 - `~/.software_organizer/retention_rules.json`
-- `~/.software_organizer/app.log` / `server.log`
+- `~/.software_organizer/app.log`（桌面版）
+- `~/.software_organizer/skill-server.log`（独立 Skill 服务）
 
-这些文件不提交到 GitHub，并以仅当前用户可读的权限保存。`/api/config` 默认只返回配置状态和掩码，不会把真实 API Key 原样返回给前端页面；保存模型配置时，如果 API Key 输入框留空，会保留原有 Key。
+这些文件不提交到 GitHub，并以仅当前用户可读的权限保存；旧版本遗留的日志也会在启动时自动收紧权限。`/api/config` 默认只返回配置状态和掩码，不会把真实 API Key 原样返回给前端页面；保存模型配置时，如果 API Key 输入框留空，会保留原有 Key。
 
 ## 📚 维护文档
 
