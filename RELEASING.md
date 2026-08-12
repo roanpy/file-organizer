@@ -13,7 +13,7 @@
 
 ## macOS Application
 
-`./scripts/build_standalone.sh` creates `dist/FileOrganizer.app` from the reviewed `requirements.lock`. Current CI artifacts are Apple Silicon (`arm64`) and ad-hoc signed. A public macOS download should use Developer ID signing and notarization, provide a checksum, and be distributed as a documented release asset rather than committed to the repository.
+`./scripts/build_standalone.sh` creates `dist/FileOrganizer.app` from the reviewed `requirements.lock` in a disposable virtual environment. Set `PYTHON_BIN` when a specific supported Python interpreter is required. Current CI artifacts are Apple Silicon (`arm64`) and ad-hoc signed. A public macOS download should use Developer ID signing and notarization, provide a checksum, and be distributed as a documented release asset rather than committed to the repository.
 
 ## Windows Application
 
