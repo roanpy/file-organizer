@@ -11,5 +11,5 @@ pydantic>=2.0.0,<3
 # ollama SDK not required; local Ollama calls use its HTTP API
 # 工具
 Pillow>=10.0.0,<13
-pywebview>=4.0.0,<7
+pywebview>=6.2.1,<7
 pyinstaller>=6.0.0,<7
