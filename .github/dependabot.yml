@@ -4,11 +4,9 @@ updates:
     directory: "/"
     schedule:
       interval: monthly
-    open-pull-requests-limit: 5
-    groups:
-      python-dependencies:
-        patterns:
-          - "*"
+    # Version updates must refresh requirements.lock and pass packaging validation.
+    # A zero limit disables routine version PRs without disabling security updates.
+    open-pull-requests-limit: 0
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
