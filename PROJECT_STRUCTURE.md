@@ -15,6 +15,9 @@
 | `SoftwareOrganizer-Skill/` | 目录 | **[新增]** 独立的 AI Agent Skill 模块，兼容 Claude Code/OpenClaw。 |
 | `docs/` | 目录 | 批量处理、维护过程、打包核验等说明文档 |
 | `.github/workflows/` | 目录 | GitHub Actions：提交检查与多平台构建 |
+| `.github/ISSUE_TEMPLATE/` | 目录 | Bug/功能请求表单和安全报告入口 |
+| `.github/PULL_REQUEST_TEMPLATE.md` | 文档 | Pull Request 检查清单 |
+| `.github/dependabot.yml` | 配置 | Python 和 GitHub Actions 依赖更新计划 |
 
 ---
 

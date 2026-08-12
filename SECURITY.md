@@ -6,7 +6,7 @@ Security fixes are applied to the latest version on the default branch. Older pa
 
 ## Reporting a Vulnerability
 
-Please report security issues privately through GitHub Security Advisories. Do not open a public issue containing API keys, local filesystem paths, configuration files, logs, or proof-of-concept data from a real machine.
+Please report security issues privately through [GitHub Security Advisories](https://github.com/roanpy/file-organizer/security/advisories/new). Do not open a public issue containing API keys, local filesystem paths, configuration files, logs, or proof-of-concept data from a real machine.
 
 Include:
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.5.1] - 2026-08-12
+
+### Added
+- GitHub issue forms, a pull request checklist, and monthly Dependabot updates for Python and Actions dependencies.
+- CI syntax coverage for the localization script.
+
+### Security
+- `GET /api/ai-config` recursively removes credential-shaped fields from its response, covering legacy and custom configuration data.
+- Public release metadata and security automation are aligned with the latest source commit.
+
 ## [1.5.0] - 2026-08-09
 
 ### Added

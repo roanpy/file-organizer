@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a reproducible problem without sharing private files or credentials.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include API keys, tokens, local logs, database files, real network addresses, or real file listings.
+        Use synthetic filenames and paths such as `/tmp/demo/inbox/app-v1.0.dmg`.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and the expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: List the smallest sequence that reproduces the problem using synthetic data.
+      placeholder: |
+        1. Create a synthetic source folder...
+        2. Configure a target folder...
+        3. Click...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.5.0 or 1234567
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Safe diagnostics
+      description: Include redacted error text and relevant settings. Never attach private logs or configuration files.
+    validations:
+      required: false

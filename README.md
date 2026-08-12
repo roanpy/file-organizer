@@ -5,7 +5,7 @@ Local-first file, document, and software-package organizer for macOS and Windows
 [![Checks](https://github.com/roanpy/file-organizer/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/roanpy/file-organizer/actions/workflows/ci.yml)
 [![Status](https://img.shields.io/badge/status-source%20stable-2ea043.svg)](CHANGELOG.md)
 [![Binaries](https://img.shields.io/badge/binaries-signing%20%26%20license%20gated-d97706.svg)](RELEASING.md)
-[![Version](https://img.shields.io/github/v/tag/roanpy/file-organizer?label=version&sort=semver)](https://github.com/roanpy/file-organizer/tags)
+[![Version](https://img.shields.io/github/v/tag/roanpy/file-organizer?label=version&sort=semver)](https://github.com/roanpy/file-organizer/releases)
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-555555.svg)](RELEASING.md)
 [![License](https://img.shields.io/badge/license-MIT-2ea043.svg)](LICENSE)
@@ -93,6 +93,7 @@ Provider keys are stored locally, masked in API responses, and never included in
 python -m unittest discover -s tests -v
 python -m compileall -q src SoftwareOrganizer-Skill tests
 node --check static/app.js
+node --check static/i18n.js
 python scripts/check_public_safety.py
 python -m pip check
 ```
@@ -115,6 +116,8 @@ Windows uses `scripts/build_windows.bat` and its platform-specific PyInstaller s
 - [Project structure](PROJECT_STRUCTURE.md)
 - [Batch processing logic](docs/batch_processing_logic.md)
 - [AI agent skill](SoftwareOrganizer-Skill/README.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
 - [Maintenance and open-source preparation log](docs/maintenance_log_2026_08_09_open_source.md)
 - [Changelog](CHANGELOG.md)
 

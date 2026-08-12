@@ -24,6 +24,7 @@ The project is developed primarily with OpenAI Codex, with other AI coding agent
 python -m unittest discover -s tests -v
 python -m compileall -q src SoftwareOrganizer-Skill tests
 node --check static/app.js
+node --check static/i18n.js
 python scripts/check_public_safety.py
 python -m pip check
 ```
