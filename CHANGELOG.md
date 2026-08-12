@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Security
+- Pinned CI and build actions to immutable commits and grouped future Actions updates.
+
 ## [1.5.1] - 2026-08-12
 
 ### Added
