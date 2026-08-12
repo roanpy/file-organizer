@@ -11,6 +11,37 @@ import main
 
 
 class StartupTest(unittest.TestCase):
+    def test_build_scripts_use_isolated_environments(self):
+        root = os.path.join(os.path.dirname(__file__), "..")
+        with open(os.path.join(root, "scripts", "build_standalone.sh"), encoding="utf-8") as script_file:
+            mac_script = script_file.read()
+        with open(os.path.join(root, "scripts", "build_windows.bat"), encoding="utf-8") as script_file:
+            windows_script = script_file.read()
+
+        self.assertIn("mktemp -d", mac_script)
+        self.assertIn('"$BUILD_PYTHON" -I -m pip', mac_script)
+        self.assertNotIn("source .venv/bin/activate", mac_script)
+        self.assertIn("%TEMP%\\file-organizer-build-", windows_script)
+        self.assertIn('"%BUILD_PYTHON%" -I -m pip', windows_script)
+        self.assertNotIn("call venv\\Scripts\\activate", windows_script)
+
+        with open(os.path.join(root, ".github", "workflows", "build.yml"), encoding="utf-8") as workflow_file:
+            build_workflow = workflow_file.read()
+        self.assertNotIn("pip install --upgrade pip", build_workflow)
+
+    def test_binary_specs_include_license_notices(self):
+        root = os.path.join(os.path.dirname(__file__), "..")
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(root, "static", "vendor", "fontawesome", "LICENSE.txt")
+            )
+        )
+        for spec_name in ("SoftwareOrganizer.spec", "SoftwareOrganizer.windows.spec"):
+            with open(os.path.join(root, spec_name), encoding="utf-8") as spec_file:
+                spec = spec_file.read()
+            self.assertIn("('LICENSE', '.')", spec)
+            self.assertIn("('THIRD_PARTY_NOTICES.md', '.')", spec)
+
     def test_packaged_log_is_private_and_rotates(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             handler = main._create_private_rotating_log_handler(temp_dir)

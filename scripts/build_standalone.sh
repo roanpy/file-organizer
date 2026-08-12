@@ -34,27 +34,24 @@ echo "=========================================="
 cd "$(dirname "$0")/.." || exit
 
 # Check if Python is installed
-if ! command -v python3 &> /dev/null; then
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+if ! command -v "$PYTHON_BIN" &> /dev/null; then
     echo "❌ Error: Python3 is not installed or not in PATH"
     exit 1
 fi
 
-echo "✓ Python3 found: $(python3 --version)"
+echo "✓ Python3 found: $($PYTHON_BIN --version)"
 
-# Create virtual environment if it doesn't exist
-if [ ! -d ".venv" ]; then
-    echo "📦 Creating virtual environment (.venv)..."
-    python3 -m venv .venv
-fi
-
-# Activate virtual environment
-echo "🔄 Activating virtual environment..."
-source .venv/bin/activate
+# Build from an isolated environment so local development packages cannot leak in.
+BUILD_ENV_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/file-organizer-build.XXXXXX")"
+trap 'rm -rf "$BUILD_ENV_ROOT"' EXIT
+echo "📦 Creating isolated build environment..."
+"$PYTHON_BIN" -m venv "$BUILD_ENV_ROOT/venv"
+BUILD_PYTHON="$BUILD_ENV_ROOT/venv/bin/python"
 
 # Install dependencies
 echo "📥 Installing dependencies..."
-pip install --upgrade pip
-pip install --require-hashes -r requirements.lock
+"$BUILD_PYTHON" -I -m pip install --require-hashes -r requirements.lock
 
 # Clean old build files
 echo "🧹 Cleaning old build files..."
@@ -85,7 +82,7 @@ if [ ! -f "SoftwareOrganizer.spec" ]; then
     exit 1
 fi
 
-pyinstaller --noconfirm --clean SoftwareOrganizer.spec
+"$BUILD_PYTHON" -I -m PyInstaller --noconfirm --clean SoftwareOrganizer.spec
 
 # Check if build was successful
 if [ -d "dist/FileOrganizer.app" ]; then

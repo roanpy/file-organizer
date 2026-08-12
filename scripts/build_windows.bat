@@ -1,4 +1,5 @@
 @echo off
+setlocal
 REM ==========================================
 REM      File Organizer - Windows Build
 REM ==========================================
@@ -24,26 +25,22 @@ REM Check if Python is installed
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Python is not installed or not in PATH.
-    pause
     exit /b 1
 )
 
 echo [OK] Python found.
 
-REM Create virtual environment if it doesn't exist
-if not exist venv (
-    echo [INFO] Creating virtual environment...
-    python -m venv venv
-)
-
-REM Activate virtual environment
-echo [INFO] Activating virtual environment...
-call venv\Scripts\activate
+REM Build from an isolated environment so local development packages cannot leak in.
+set "BUILD_ENV=%TEMP%\file-organizer-build-%RANDOM%-%RANDOM%"
+echo [INFO] Creating isolated build environment...
+python -m venv "%BUILD_ENV%"
+if errorlevel 1 goto :error
+set "BUILD_PYTHON=%BUILD_ENV%\Scripts\python.exe"
 
 REM Install dependencies
 echo [INFO] Installing dependencies...
-python -m pip install --upgrade pip
-pip install --require-hashes -r requirements.lock
+"%BUILD_PYTHON%" -I -m pip install --require-hashes -r requirements.lock
+if errorlevel 1 goto :error
 
 REM Clean old build files
 echo [INFO] Cleaning old build files...
@@ -52,13 +49,13 @@ if exist dist rmdir /s /q dist
 
 REM Build the executable
 echo [INFO] Building Executable (using spec file)...
-pyinstaller --noconfirm --clean SoftwareOrganizer.windows.spec
+"%BUILD_PYTHON%" -I -m PyInstaller --noconfirm --clean SoftwareOrganizer.windows.spec
+if errorlevel 1 goto :error
 
 if not exist "dist\FileOrganizer\FileOrganizer.exe" (
     echo.
     echo [ERROR] Build failed!
-    pause
-    exit /b 1
+    goto :error
 )
 
 echo.
@@ -68,4 +65,9 @@ echo.
 echo Executable: dist\FileOrganizer\FileOrganizer.exe
 echo.
 echo ==========================================
-pause
+if exist "%BUILD_ENV%" rmdir /s /q "%BUILD_ENV%"
+exit /b 0
+
+:error
+if exist "%BUILD_ENV%" rmdir /s /q "%BUILD_ENV%"
+exit /b 1

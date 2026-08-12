@@ -7,7 +7,6 @@ Provides endpoints for software scanning, analysis, categorization, and transfer
 
 import os
 import sys
-import datetime
 import asyncio
 import time
 import re
@@ -16,6 +15,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -48,15 +48,6 @@ from software_organizer.database import get_db
 
 # Create FastAPI application
 app = FastAPI(title="File Organizer API", version="1.5.1")
-
-# Log redirection (for packaged mode)
-if getattr(sys, "frozen", False):
-    log_dir = os.path.join(os.path.expanduser("~"), ".software_organizer")
-    os.makedirs(log_dir, exist_ok=True)
-    log_path = os.path.join(log_dir, "server.log")
-    sys.stdout = sys.stderr = open(log_path, "a", encoding="utf-8")
-    print(f"--- File Organizer Started at {datetime.datetime.now()} ---")
-
 
 def get_static_dir() -> str:
     """Get the static files directory."""
@@ -402,6 +393,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type"],
 )
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
 
 
 # ==============================================================================

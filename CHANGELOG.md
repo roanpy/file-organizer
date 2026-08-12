@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Changed
+- Local packaging scripts now build from disposable locked environments so development-only packages cannot leak into release binaries.
+- Local API requests now require a loopback Host header; legacy runtime logs are migrated to owner-only permissions, packaged binaries include license notices, and the dependency lock/CI cover the documented Python 3.10 minimum.
 - CI and release builds now install a hashed cross-platform dependency lock; Ruff runs as a required CI check.
 - Routine Python Dependabot version PRs are disabled because they cannot safely refresh the reviewed lock and packaging evidence; security updates remain enabled.
 - Documentation identifies Windows packaging as experimental and current macOS CI artifacts as arm64/ad-hoc signed.
