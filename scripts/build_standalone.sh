@@ -3,7 +3,7 @@
 #      File Organizer - Mac Build Script
 # ==========================================
 #
-# Version: 1.5.0 (2026-08-09)
+# Version: 1.5.1 (2026-08-12)
 # Function: Build standalone Mac application (.app)
 #
 # Key Features:
@@ -54,7 +54,7 @@ source .venv/bin/activate
 # Install dependencies
 echo "📥 Installing dependencies..."
 pip install --upgrade pip
-pip install --upgrade -r requirements.txt
+pip install --require-hashes -r requirements.lock
 
 # Clean old build files
 echo "🧹 Cleaning old build files..."

@@ -22,6 +22,7 @@ The project is developed primarily with OpenAI Codex, with other AI coding agent
 
 ```bash
 python -m unittest discover -s tests -v
+python -m ruff check src tests scripts SoftwareOrganizer-Skill
 python -m compileall -q src SoftwareOrganizer-Skill tests
 node --check static/app.js
 node --check static/i18n.js

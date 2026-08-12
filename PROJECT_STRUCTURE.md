@@ -9,9 +9,11 @@
 | `LICENSE` | 法律 | MIT 开源许可证 |
 | `SECURITY.md` / `CONTRIBUTING.md` | 文档 | 安全报告与贡献规则 |
 | `CODE_OF_CONDUCT.md` / `RELEASING.md` / `THIRD_PARTY_NOTICES.md` | 文档 | 行为准则、发布流程、第三方许可声明 |
-| `requirements.txt` | 配置 | Python 依赖 |
+| `requirements.txt` | 配置 | 直接依赖兼容范围 |
 | `SoftwareOrganizer.spec` | 配置 | macOS PyInstaller 配置，产物为 `FileOrganizer.app` |
 | `SoftwareOrganizer.windows.spec` | 配置 | Windows PyInstaller 配置，产物为 `FileOrganizer/FileOrganizer.exe` |
+| `requirements.lock` | 配置 | CI 与正式打包使用的跨平台哈希锁文件 |
+| `requirements-dev.txt` | 配置 | CI/开发检查工具 |
 | `SoftwareOrganizer-Skill/` | 目录 | **[新增]** 独立的 AI Agent Skill 模块，兼容 Claude Code/OpenClaw。 |
 | `docs/` | 目录 | 批量处理、维护过程、打包核验等说明文档 |
 | `.github/workflows/` | 目录 | GitHub Actions：提交检查与多平台构建 |

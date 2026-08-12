@@ -1,6 +1,8 @@
 import os
 import sys
 import unittest
+import stat
+import tempfile
 from unittest.mock import patch
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -9,6 +11,19 @@ import main
 
 
 class StartupTest(unittest.TestCase):
+    def test_packaged_log_is_private_and_rotates(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            handler = main._create_private_rotating_log_handler(temp_dir)
+            try:
+                self.assertEqual(handler.maxBytes, 2 * 1024 * 1024)
+                self.assertEqual(handler.backupCount, 2)
+                directory_mode = stat.S_IMODE(os.stat(temp_dir).st_mode)
+                mode = stat.S_IMODE(os.stat(os.path.join(temp_dir, "app.log")).st_mode)
+                self.assertEqual(directory_mode, 0o700)
+                self.assertEqual(mode, 0o600)
+            finally:
+                handler.close()
+
     def test_macos_preferred_language_wins_over_c_utf8(self):
         defaults_output = '"zh-Hans-US"'
         completed = type("Completed", (), {"stdout": defaults_output})()

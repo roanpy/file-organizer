@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- CI and release builds now install a hashed cross-platform dependency lock; Ruff runs as a required CI check.
+- Documentation identifies Windows packaging as experimental and current macOS CI artifacts as arm64/ad-hoc signed.
+- Packaged application logs rotate at 2 MiB with two backups and use owner-only permissions.
+
+### Security
+- Pinned CI and build actions to immutable commits and grouped future Actions updates.
+
 ## [1.5.1] - 2026-08-12
 
 ### Added

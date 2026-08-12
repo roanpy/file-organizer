@@ -10,6 +10,7 @@ import threading
 import time
 import socket
 import logging
+from logging.handlers import RotatingFileHandler
 import json
 import importlib
 import locale
@@ -25,13 +26,24 @@ except ImportError:
     print("Error: pywebview not installed. Please run: pip install pywebview")
     sys.exit(1)
 
+def _create_private_rotating_log_handler(log_dir: str) -> RotatingFileHandler:
+    os.makedirs(log_dir, exist_ok=True)
+    os.chmod(log_dir, 0o700)
+    log_path = os.path.join(log_dir, "app.log")
+    handler = RotatingFileHandler(
+        log_path, maxBytes=2 * 1024 * 1024, backupCount=2, encoding="utf-8"
+    )
+    os.chmod(log_path, 0o600)
+    return handler
+
+
 # Configure logging
 if getattr(sys, "frozen", False):
-    log_dir = os.path.join(os.path.expanduser("~"), ".software_organizer")
-    os.makedirs(log_dir, exist_ok=True)
-    log_path = os.path.join(log_dir, "app.log")
+    log_handler = _create_private_rotating_log_handler(
+        os.path.join(os.path.expanduser("~"), ".software_organizer")
+    )
     logging.basicConfig(
-        filename=log_path,
+        handlers=[log_handler],
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
