@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## [1.5.2] - 2026-08-13
 
 ### Changed
+- AI path suggestions now use per-file local IDs, preventing same-named files in different source folders from receiving each other's destination.
 - Local packaging scripts now build from disposable locked environments so development-only packages cannot leak into release binaries.
 - Local API requests now require a loopback Host header; legacy runtime logs are migrated to owner-only permissions, packaged binaries include license notices, and the dependency lock/CI cover the documented Python 3.10 minimum.
 - CI and release builds now install a hashed cross-platform dependency lock; Ruff runs as a required CI check.
@@ -10,7 +11,12 @@
 - Documentation identifies Windows packaging as experimental and current macOS CI artifacts as arm64/ad-hoc signed.
 - Packaged application logs rotate at 2 MiB with two backups and use owner-only permissions.
 
+### Fixed
+- File selection, AI recommendations, and group selection now keep checkbox state and cleanup-row dimming in sync.
+
 ### Security
+- Dynamic notifications and provider model names are rendered as text, category IDs are validated at write boundaries, and special-character file paths no longer break selection state.
+- Main-app and Skill scans ignore external symlinks; AI prompts keep local source paths private and directory suggestions must remain inside managed candidates.
 - Pinned CI and build actions to immutable commits and grouped future Actions updates.
 
 ## [1.5.1] - 2026-08-12

@@ -3,7 +3,7 @@
 #      File Organizer - Mac Build Script
 # ==========================================
 #
-# Version: 1.5.1 (2026-08-12)
+# Version: 1.5.2 (2026-08-13)
 # Function: Build standalone Mac application (.app)
 #
 # Key Features:

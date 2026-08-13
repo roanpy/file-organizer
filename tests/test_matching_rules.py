@@ -1,6 +1,8 @@
 import os
 import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
@@ -255,6 +257,38 @@ class MatchingRulesTest(unittest.TestCase):
 
         self.assertEqual(len(group_software_by_name(items)), 2)
         self.assertEqual(file_ops.software_name_similarity("setup", "setup"), 0)
+
+    def test_scans_do_not_follow_external_symlinks(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            source = os.path.join(tmpdir, "source")
+            target = os.path.join(tmpdir, "target")
+            outside = os.path.join(tmpdir, "outside")
+            os.makedirs(source)
+            os.makedirs(target)
+            os.makedirs(outside)
+
+            outside_file = os.path.join(outside, "PrivateTool.dmg")
+            open(outside_file, "w", encoding="utf-8").close()
+            os.symlink(outside, os.path.join(source, "external-dir"))
+            os.symlink(outside_file, os.path.join(source, "external-file.dmg"))
+            os.symlink(outside, os.path.join(target, "external-dir"))
+            os.symlink(outside_file, os.path.join(target, "external-file.dmg"))
+
+            categories = {
+                "mac": {
+                    "name": "Mac",
+                    "formats": [".dmg"],
+                    "target_dir": target,
+                    "cross_format_match": False,
+                }
+            }
+            with patch.object(file_ops, "load_config", return_value={"source_dir": source}), patch.object(
+                file_ops, "get_all_formats", return_value=[".dmg"]
+            ), patch.object(file_ops, "get_category_by_extension", return_value="mac"), patch.object(
+                file_ops, "get_categories", return_value=categories
+            ):
+                self.assertEqual(file_ops.scan_software(), [])
+                self.assertEqual(file_ops.scan_target_software(), [])
 
 
 if __name__ == "__main__":

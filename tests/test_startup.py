@@ -8,9 +8,20 @@ from unittest.mock import patch
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import main
+import server
+from software_organizer import __version__
 
 
 class StartupTest(unittest.TestCase):
+    def test_runtime_and_bundle_versions_match(self):
+        root = os.path.join(os.path.dirname(__file__), "..")
+        with open(os.path.join(root, "SoftwareOrganizer.spec"), encoding="utf-8") as spec_file:
+            bundle_spec = spec_file.read()
+
+        self.assertEqual(server.app.version, __version__)
+        self.assertIn(f"'CFBundleShortVersionString': '{__version__}'", bundle_spec)
+        self.assertIn(f"'CFBundleVersion': '{__version__}'", bundle_spec)
+
     def test_build_scripts_use_isolated_environments(self):
         root = os.path.join(os.path.dirname(__file__), "..")
         with open(os.path.join(root, "scripts", "build_standalone.sh"), encoding="utf-8") as script_file:

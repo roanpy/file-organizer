@@ -13,6 +13,7 @@ Contains:
 import os
 import json
 import copy
+import re
 import tempfile
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
@@ -76,6 +77,12 @@ DEFAULT_CATEGORIES = {
         "cross_format_match": True,
     },
 }
+
+CATEGORY_ID_PATTERN = re.compile(r"^[a-z0-9]+$")
+
+
+def is_valid_category_id(cat_id: str) -> bool:
+    return bool(CATEGORY_ID_PATTERN.fullmatch(cat_id or ""))
 
 # AI Core Rules
 DEFAULT_CORE_RULES = """You are a software version identification expert. Your task is to analyze software names and identify different versions of the same software.
@@ -306,6 +313,12 @@ def check_format_conflict(
 def add_category(cat_id: str, name: str, formats: List[str]) -> Dict[str, Any]:
     """Add a new software category."""
     config = load_config()
+
+    if not is_valid_category_id(cat_id):
+        return {
+            "success": False,
+            "error": "Category ID must contain only lowercase letters and numbers.",
+        }
 
     # Check if ID already exists
     if cat_id in config["categories"]:

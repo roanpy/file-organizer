@@ -1227,6 +1227,7 @@ def batch_analyze_path_suggestions(
             "suggestions": [
                 {
                     "filename": "Software.dmg",
+                    "source_path": "/local/source/Software.dmg",
                     "suggested_path": "/path/to/BestFolder",
                     "reason": "Why it fits here"
                 }
@@ -1236,10 +1237,19 @@ def batch_analyze_path_suggestions(
     if not software_list or not available_directories:
         return {"suggestions": []}
 
-    # Prepare data for AI
+    # Use local item IDs so duplicate filenames cannot overwrite each other's
+    # suggestions. Paths never leave the local process.
+    item_lookup = {}
+    filename_counts = {}
     sw_info = []
-    for s in software_list:
-        sw_info.append(f"- {s['filename']} (Name: {s.get('name', 'Unknown')})")
+    for index, software in enumerate(software_list, start=1):
+        item_id = f"ITEM_{index:03d}"
+        item_lookup[item_id] = software
+        filename = software["filename"]
+        filename_counts[filename] = filename_counts.get(filename, 0) + 1
+        sw_info.append(
+            f"- {item_id}: {filename} (Name: {software.get('name', 'Unknown')})"
+        )
 
     # Send stable local IDs instead of absolute paths. The server maps IDs back
     # to local directories after the model responds.
@@ -1265,11 +1275,13 @@ def batch_analyze_path_suggestions(
 3. If multiple folders seem relevant, pick the most specific one.
 4. If NO folder is suitable, suggest the "ROOT" (which means the base category folder).
 5. Return the directory ID (for example, "DIR_001") in "suggested_path". Never return an absolute filesystem path.
+6. Return the exact item ID (for example, "ITEM_001") in "item_id" for every suggestion.
 
 ## OUTPUT FORMAT (JSON):
 {{
     "suggestions": [
         {{
+            "item_id": "ITEM_001 from the software list",
             "filename": "Exact Filename from list",
             "suggested_path": "DIR_001 from available folders OR 'ROOT'",
             "reason": "Short reason in Chinese"
@@ -1279,10 +1291,27 @@ def batch_analyze_path_suggestions(
 
     try:
         result = _call_ai_engine(engine_choice, config, prompt, json_mode=True)
+        valid_suggestions = []
         for suggestion in result.get("suggestions", []):
+            item = item_lookup.get(str(suggestion.get("item_id", "")).strip())
+            if item is None:
+                filename = suggestion.get("filename")
+                if filename_counts.get(filename) == 1:
+                    item = next(
+                        software
+                        for software in software_list
+                        if software["filename"] == filename
+                    )
+            if item is None:
+                continue
+
             directory_id = str(suggestion.get("suggested_path", "")).strip()
             if directory_id in directory_lookup:
                 suggestion["suggested_path"] = directory_lookup[directory_id]
+            suggestion["filename"] = item["filename"]
+            suggestion["source_path"] = item.get("path", "")
+            valid_suggestions.append(suggestion)
+        result["suggestions"] = valid_suggestions
         return result
     except Exception as e:
         print(f"Batch path suggestion failed: {e}")

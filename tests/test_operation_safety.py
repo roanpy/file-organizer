@@ -25,6 +25,36 @@ class OperationSafetyTest(unittest.TestCase):
         self.assertFalse(server._is_path_within("/tmp/root-old/file.dmg", "/tmp/root"))
         self.assertFalse(server._is_path_within("file.dmg", "/tmp/root"))
 
+    def test_ai_directory_resolution_stays_in_managed_candidates(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            managed = os.path.join(tmpdir, "managed")
+            candidate = os.path.join(managed, "Tools")
+            outside = os.path.join(tmpdir, "outside")
+            os.makedirs(candidate)
+            os.makedirs(outside)
+
+            self.assertEqual(
+                server._resolve_suggested_directory(candidate, [candidate], managed),
+                candidate,
+            )
+            self.assertIsNone(
+                server._resolve_suggested_directory(outside, [candidate], managed)
+            )
+
+    def test_config_endpoint_rejects_invalid_category_ids(self):
+        request = server.ConfigUpdate(
+            categories={'bad" onclick="alert(1)': {"name": "Unsafe"}}
+        )
+        with patch.object(server, "load_config", return_value={"categories": {}}), patch.object(
+            server, "save_config"
+        ) as save_config:
+            with self.assertRaises(HTTPException):
+                import asyncio
+
+                asyncio.run(server.update_config(request))
+
+        save_config.assert_not_called()
+
     def test_transfer_rejects_file_outside_configured_source(self):
         config = {
             "source_dir": "/source",
