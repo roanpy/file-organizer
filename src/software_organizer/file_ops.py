@@ -249,6 +249,8 @@ def scan_software(source_dir: Optional[str] = None) -> List[Dict[str, Any]]:
             ext = os.path.splitext(filename)[1].lower()
             if ext in all_formats:
                 file_path = os.path.join(root, filename)
+                if os.path.islink(file_path):
+                    continue
                 rel_path = os.path.relpath(file_path, source)
 
                 # Determine category by extension
@@ -415,11 +417,15 @@ def scan_target_software(category_id: str = None) -> List[Dict[str, Any]]:
         if not target_dir or not os.path.isdir(target_dir):
             continue
 
-        for root, _, files in os.walk(target_dir, followlinks=True):
+        # Do not traverse directory symlinks: managed roots must not expose files
+        # from unrelated locations to matching or optional AI analysis.
+        for root, _, files in os.walk(target_dir, followlinks=False):
             for filename in files:
                 ext = os.path.splitext(filename)[1].lower()
                 if ext in formats:
                     file_path = os.path.join(root, filename)
+                    if os.path.islink(file_path):
+                        continue
                     rel_path = os.path.relpath(file_path, target_dir)
                     parent_dir = os.path.dirname(rel_path)
 

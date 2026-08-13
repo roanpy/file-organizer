@@ -102,6 +102,7 @@ class AIHttpEnginesTest(unittest.TestCase):
             return {
                 "suggestions": [
                     {
+                        "item_id": "ITEM_001",
                         "filename": "Tool.dmg",
                         "suggested_path": "DIR_001",
                         "reason": "matching folder",
@@ -114,15 +115,46 @@ class AIHttpEnginesTest(unittest.TestCase):
         result = ai_engines.batch_analyze_path_suggestions(
             "gemini",
             {},
-            [{"filename": "Tool.dmg", "name": "Tool"}],
+            [{"filename": "Tool.dmg", "name": "Tool", "path": "/source/Tool.dmg"}],
             ["/tmp/private/Tools/04_Net"],
         )
 
         self.assertNotIn("/tmp/private/Tools/04_Net", captured["prompt"])
+        self.assertNotIn("/source/Tool.dmg", captured["prompt"])
         self.assertIn("DIR_001", captured["prompt"])
+        self.assertIn("ITEM_001", captured["prompt"])
         self.assertEqual(
             result["suggestions"][0]["suggested_path"],
             "/tmp/private/Tools/04_Net",
+        )
+        self.assertEqual(result["suggestions"][0]["source_path"], "/source/Tool.dmg")
+
+    def test_batch_path_suggestions_keep_duplicate_filenames_distinct(self):
+        def fake_call(engine, config, prompt, json_mode=True):
+            return {
+                "suggestions": [
+                    {"item_id": "ITEM_001", "suggested_path": "DIR_001"},
+                    {"item_id": "ITEM_002", "suggested_path": "DIR_002"},
+                ]
+            }
+
+        ai_engines._call_ai_engine = fake_call
+        result = ai_engines.batch_analyze_path_suggestions(
+            "gemini",
+            {},
+            [
+                {"filename": "setup.zip", "name": "Product A", "path": "/source/a/setup.zip"},
+                {"filename": "setup.zip", "name": "Product B", "path": "/source/b/setup.zip"},
+            ],
+            ["/target/Product A", "/target/Product B"],
+        )
+
+        self.assertEqual(
+            [(item["source_path"], item["suggested_path"]) for item in result["suggestions"]],
+            [
+                ("/source/a/setup.zip", "/target/Product A"),
+                ("/source/b/setup.zip", "/target/Product B"),
+            ],
         )
 
 

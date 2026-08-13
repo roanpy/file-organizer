@@ -43,6 +43,9 @@ jobs:
       - name: Check frontend localization syntax
         run: node --check static/i18n.js
 
+      - name: Check frontend safety helpers
+        run: node tests/test_frontend_safety.js
+
       - name: Check public safety
         run: python scripts/check_public_safety.py
 

@@ -22,6 +22,7 @@ from pydantic import BaseModel
 
 # Import business modules
 from software_organizer.config import (
+    is_valid_category_id,
     load_config,
     save_config,
     load_ai_config,
@@ -47,7 +48,7 @@ from software_organizer.transfer import batch_move, batch_delete
 from software_organizer.database import get_db
 
 # Create FastAPI application
-app = FastAPI(title="File Organizer API", version="1.5.1")
+app = FastAPI(title="File Organizer API", version="1.5.2")
 
 def get_static_dir() -> str:
     """Get the static files directory."""
@@ -268,14 +269,16 @@ def _resolve_suggested_directory(
     if raw.upper() == "ROOT":
         return root_dir if root_dir and os.path.isdir(root_dir) else None
 
-    expanded = os.path.abspath(os.path.expanduser(raw))
-    if os.path.isdir(expanded):
-        return expanded
-
     candidate_paths = []
     if root_dir:
         candidate_paths.append(root_dir)
     candidate_paths.extend(candidates)
+
+    expanded = os.path.abspath(os.path.expanduser(raw))
+    if os.path.isdir(expanded) and any(
+        _is_path_within(expanded, candidate) for candidate in candidate_paths
+    ):
+        return expanded
 
     normalized = os.path.normcase(os.path.normpath(raw))
     compact = raw.strip("/").lower()
@@ -501,7 +504,12 @@ async def update_config(config_update: ConfigUpdate):
 
     update_data = config_update.model_dump(exclude_none=True)
     for key, value in update_data.items():
-        if key in ("gemini", "deepseek") and isinstance(value, dict):
+        if key == "categories" and isinstance(value, dict):
+            invalid_ids = [cat_id for cat_id in value if not is_valid_category_id(cat_id)]
+            if invalid_ids:
+                raise HTTPException(status_code=400, detail="分类 ID 只能包含小写字母和数字")
+            config.setdefault("categories", {}).update(value)
+        elif key in ("gemini", "deepseek") and isinstance(value, dict):
             config[key] = _merge_secret_config(config.get(key, {}), value)
         elif key == "custom_providers" and isinstance(value, dict):
             providers = dict(config.get("custom_providers", {}))
@@ -1090,9 +1098,11 @@ def analyze_software(request: AnalyzeRequest):
                             available_directories=available_dirs,
                         )
 
-                        # Convert list result to dict for easy lookup
+                        # Key by the local source path; filenames are not unique.
                         for sug in ai_result.get("suggestions", []):
-                            ai_suggestions[sug["filename"]] = sug
+                            source_path = sug.get("source_path")
+                            if source_path:
+                                ai_suggestions[source_path] = sug
                 except Exception as e:
                     print(f"AI Batch path suggestion failed: {e}")
 
@@ -1112,8 +1122,8 @@ def analyze_software(request: AnalyzeRequest):
                 path_source = "default"
 
                 # 1. Use AI Suggestion if available
-                if filename in ai_suggestions:
-                    sug = ai_suggestions[filename]
+                if s["path"] in ai_suggestions:
+                    sug = ai_suggestions[s["path"]]
                     best_dir = _resolve_suggested_directory(
                         sug.get("suggested_path"),
                         candidate_dirs,

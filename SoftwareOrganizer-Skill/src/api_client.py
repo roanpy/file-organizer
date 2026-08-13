@@ -211,7 +211,7 @@ def scan_directory(source_path: str, extensions: Optional[List[str]] = None) -> 
     ext_lower = [e.lower() for e in extensions] if extensions else None
 
     for item in source.iterdir():
-        if not item.is_file():
+        if item.is_symlink() or not item.is_file():
             continue
         if item.name.startswith('.'):
             continue
@@ -439,7 +439,7 @@ def scan_target_directories(target_dir: str, categories: Dict[str, Any]) -> Dict
 
         files = []
         for item in cat_path.iterdir():
-            if item.is_file() and not item.name.startswith('.'):
+            if not item.is_symlink() and item.is_file() and not item.name.startswith('.'):
                 stat = item.stat()
                 files.append({
                     "filename": item.name,

@@ -106,7 +106,7 @@ app = BUNDLE(
     bundle_identifier='com.roanpy.fileorganizer',
     info_plist={
         'CFBundleDisplayName': 'File Organizer',
-        'CFBundleShortVersionString': '1.5.1',
-        'CFBundleVersion': '1.5.1',
+        'CFBundleShortVersionString': '1.5.2',
+        'CFBundleVersion': '1.5.2',
     },
 )

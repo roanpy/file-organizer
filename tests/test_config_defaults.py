@@ -3,10 +3,12 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from software_organizer.config import (
+    add_category,
     ensure_private_file,
     ensure_private_runtime_state,
     get_default_config,
@@ -57,6 +59,16 @@ class ConfigDefaultsTest(unittest.TestCase):
             ensure_private_runtime_state(tmpdir)
 
             self.assertTrue(all(os.stat(path).st_mode & 0o777 == 0o600 for path in paths))
+
+    def test_category_ids_are_validated_in_the_storage_layer(self):
+        with patch(
+            "software_organizer.config.load_config",
+            return_value={"categories": {}},
+        ), patch("software_organizer.config.save_config") as save_config:
+            result = add_category('bad" onclick="alert(1)', "Unsafe", [".dmg"])
+
+        self.assertFalse(result["success"])
+        save_config.assert_not_called()
 
 
 if __name__ == "__main__":

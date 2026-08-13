@@ -105,6 +105,29 @@ class SkillSafetyTest(unittest.TestCase):
             self.assertFalse(result["success"])
             run.assert_not_called()
 
+    def test_scanners_skip_file_symlinks(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            source = Path(tmpdir) / "source"
+            target = Path(tmpdir) / "target"
+            external = Path(tmpdir) / "external"
+            source.mkdir()
+            target.mkdir()
+            external.mkdir()
+            external_file = external / "private.dmg"
+            external_file.write_text("private", encoding="utf-8")
+            (source / "source-link.dmg").symlink_to(external_file)
+            (target / "target-link.dmg").symlink_to(external_file)
+
+            with patch.object(skill_api_client, "load_config", return_value={"categories": {}}):
+                source_result = skill_api_client.scan_directory(str(source))
+            target_result = skill_api_client.scan_target_directories(
+                str(target),
+                {"mac": {"name": "Mac", "target_dir": str(target)}},
+            )
+
+            self.assertEqual(source_result["software"], [])
+            self.assertEqual(target_result["categories"]["mac"]["files"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

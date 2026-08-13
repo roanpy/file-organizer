@@ -106,6 +106,56 @@ function escapeHtml(value) {
     }[char]));
 }
 
+function setIconText(element, iconClass, message) {
+    const icon = document.createElement('i');
+    icon.className = `fa-solid ${iconClass}`;
+    const text = document.createElement('span');
+    text.textContent = String(message ?? '');
+    element.replaceChildren(icon, text);
+}
+
+function replaceSelectOptions(select, values, currentValue = '') {
+    const normalized = (values || []).map(value => String(value));
+    const selectedValue = normalized.includes(currentValue) ? currentValue : (normalized[0] || '');
+    const options = normalized.map(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        option.selected = value === selectedValue;
+        return option;
+    });
+    select.replaceChildren(...options);
+}
+
+function findFileCheckbox(groupIndex, path) {
+    const card = document.querySelector(`.group-card[data-group="${groupIndex}"]`);
+    if (!card) return null;
+    const row = [...card.querySelectorAll('.file-row')].find(item => item.dataset.path === path);
+    return row?.querySelector('input[type="checkbox"]') || null;
+}
+
+function syncFileSelectionUI(groupIndex, path, checked) {
+    const checkbox = findFileCheckbox(groupIndex, path);
+    if (!checkbox) return;
+    checkbox.checked = checked;
+
+    const row = checkbox.closest('.file-row');
+    if (!row || row.classList.contains('retention-protected')) return;
+    const isDeleteCandidate = row.classList.contains('target') && !checked;
+    row.classList.toggle('delete-candidate', isDeleteCandidate);
+
+    const hint = row.querySelector('.file-decision-hint');
+    if (hint && row.classList.contains('target')) {
+        const translate = window.FileOrganizerI18n?.translate || (value => value);
+        const deleteLabels = new Set(['将替换/删除', translate('将替换/删除')]);
+        if (isDeleteCandidate || deleteLabels.has(hint.textContent.trim())) {
+            const label = translate(isDeleteCandidate ? '将替换/删除' : '保留');
+            hint.textContent = label;
+            hint.title = label;
+        }
+    }
+}
+
 function formatFileMtime(timestamp) {
     if (!timestamp) return '';
     const date = new Date(Number(timestamp) * 1000);
@@ -517,10 +567,7 @@ async function checkAIStatus() {
                 const modelSelect = document.getElementById(`cfg-${provider}-model`);
                 if (modelSelect && modelSelect.tagName === 'SELECT') {
                     const currentValue = modelSelect.value;
-                    const hasValidSelection = currentValue && providerStatus.models.includes(currentValue);
-                    modelSelect.innerHTML = providerStatus.models.map((m, index) =>
-                        `<option value="${m}" ${(hasValidSelection && m === currentValue) || (!hasValidSelection && index === 0) ? 'selected' : ''}>${m}</option>`
-                    ).join('');
+                    replaceSelectOptions(modelSelect, providerStatus.models, currentValue);
                 }
             }
         });
@@ -593,7 +640,7 @@ function getDirectoryOptions(categoryId) {
     const dirs = state.directories[categoryId] || [];
     return '<option value="">选择目标...</option>' +
         dirs.map(dir => `
-            <option value="${dir.path}">${dir.rel_path || dir.name}</option>
+            <option value="${escapeHtml(dir.path)}">${escapeHtml(dir.rel_path || dir.name)}</option>
         `).join('');
 }
 
@@ -1297,10 +1344,7 @@ function applyAIRecommendationsToUI(groupHashMap) {
                             state.selectedToKeep.delete(key);
                         }
 
-                        const checkbox = document.querySelector(
-                            `.group-card[data-group="${index}"] .file-row[data-path="${file.path}"] input[type="checkbox"]`
-                        );
-                        if (checkbox) checkbox.checked = state.selectedToKeep.has(key);
+                        syncFileSelectionUI(index, file.path, state.selectedToKeep.has(key));
                     });
                 }
             }
@@ -1615,9 +1659,7 @@ function renderGroups() {
             if (file.retention_protected || file.is_kept || (file.recommended_keep && file.manual_keep !== false)) {
                 const key = `${groupIndex}|${file.path}`;
                 state.selectedToKeep.add(key);
-                // 还要更新 checkbox UI
-                const checkbox = document.querySelector(`.group-card[data-group="${groupIndex}"] .file-row[data-path="${file.path}"] input[type="checkbox"]`);
-                if (checkbox) checkbox.checked = true;
+                syncFileSelectionUI(groupIndex, file.path, true);
             }
         });
     });
@@ -1648,6 +1690,7 @@ async function toggleFileKeep(path, checked, groupIndex) {
     } else {
         state.selectedToKeep.delete(key);
     }
+    syncFileSelectionUI(groupIndex, path, checked);
 
     // sync others
     state.analysisGroups.forEach((g, gIdx) => {
@@ -1660,15 +1703,13 @@ async function toggleFileKeep(path, checked, groupIndex) {
                     if (!state.selectedToKeep.has(otherKey)) {
                         state.selectedToKeep.add(otherKey);
                         // Update UI
-                        const otherCheckbox = document.querySelector(`.group-card[data-group="${gIdx}"] .file-row[data-path="${path}"] input[type="checkbox"]`);
-                        if (otherCheckbox) otherCheckbox.checked = true;
+                        syncFileSelectionUI(gIdx, path, true);
                     }
                 } else {
                     if (state.selectedToKeep.has(otherKey)) {
                         state.selectedToKeep.delete(otherKey);
                         // Update UI
-                        const otherCheckbox = document.querySelector(`.group-card[data-group="${gIdx}"] .file-row[data-path="${path}"] input[type="checkbox"]`);
-                        if (otherCheckbox) otherCheckbox.checked = false;
+                        syncFileSelectionUI(gIdx, path, false);
                     }
                 }
             }
@@ -1752,16 +1793,8 @@ function toggleGroupAll(groupIndex, checked) {
         } else {
             state.selectedToKeep.delete(key);
         }
+        syncFileSelectionUI(groupIndex, file.path, checked);
     });
-
-    // 更新 UI
-    const card = document.querySelector(`.group-card[data-group="${groupIndex}"]`);
-    if (card) {
-        card.querySelectorAll('.file-row input[type="checkbox"]').forEach(cb => {
-            if (cb.disabled && !checked) return;
-            cb.checked = checked;
-        });
-    }
 }
 
 function getGroupPolicyName(groupIndex) {
@@ -2200,7 +2233,7 @@ async function testConnection(provider) {
 
     resultEl.classList.remove('hidden');
     resultEl.className = 'test-result testing';
-    resultEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 测试中...';
+    setIconText(resultEl, 'fa-spinner fa-spin', '测试中...');
 
     // 更新状态指示灯为测试中（黄色）
     if (statusDot) {
@@ -2222,7 +2255,7 @@ async function testConnection(provider) {
         const response = await apiCall('/test-connection', 'POST', testConfig);
 
         resultEl.className = 'test-result success';
-        resultEl.innerHTML = '<i class="fa-solid fa-check-circle"></i> 连接成功！';
+        setIconText(resultEl, 'fa-check-circle', '连接成功！');
 
         // 更新状态指示灯为成功（绿色）
         if (statusDot) {
@@ -2251,17 +2284,13 @@ async function testConnection(provider) {
             const modelSelect = document.getElementById(`cfg-${provider}-model`);
             if (modelSelect && modelSelect.tagName === 'SELECT') {
                 const currentValue = modelSelect.value;
-                // 如果没有当前值或当前值不在新列表中，选中第一个
-                const hasValidSelection = currentValue && response.models.includes(currentValue);
-                modelSelect.innerHTML = response.models.map((m, index) =>
-                    `<option value="${m}" ${(hasValidSelection && m === currentValue) || (!hasValidSelection && index === 0) ? 'selected' : ''}>${m}</option>`
-                ).join('');
+                replaceSelectOptions(modelSelect, response.models, currentValue);
             }
         }
 
     } catch (error) {
         resultEl.className = 'test-result error';
-        resultEl.innerHTML = `<i class="fa-solid fa-exclamation-circle"></i> ${error.message}`;
+        setIconText(resultEl, 'fa-exclamation-circle', error.message);
 
         // 更新状态指示灯为失败（红色）
         if (statusDot) {
@@ -2534,11 +2563,14 @@ function showNotification(message, type = 'info') {
     const container = document.getElementById('notification-container');
 
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-        <span>${message}</span>
-    `;
+    const safeType = ['success', 'error', 'warning', 'info'].includes(type) ? type : 'info';
+    const iconClass = safeType === 'success'
+        ? 'fa-check-circle'
+        : safeType === 'error'
+            ? 'fa-exclamation-circle'
+            : 'fa-info-circle';
+    notification.className = `notification ${safeType}`;
+    setIconText(notification, iconClass, message);
 
     container.appendChild(notification);
 
