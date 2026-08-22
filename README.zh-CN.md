@@ -34,7 +34,7 @@ English first: [README.md](README.md)
 
 - **智能扫描**：递归扫描源目录，默认识别常用文档、Mac、iOS、Windows 和压缩包格式
 - **AI 分析**：可选调用 Gemini/DeepSeek/Ollama 辅助识别同款文件/软件的不同版本
-- **性能优化**：引入规则预筛选与智能路径推荐，大幅降低 API 调用成本
+- **性能优化**：先使用本地规则预筛选与路径推荐，减少不必要的 API 调用
 - **版本管理**：智能分组展示，自动勾选最新版本
 - **清理计划**：无需源文件，直接扫描目标目录查重，生成可确认的旧版本清理计划
 - **保留策略**：支持按文件分组保留最近 N 个版本，或设置某个分组永不自动清理
@@ -44,7 +44,7 @@ English first: [README.md](README.md)
 - **离线支持**：内置所有静态资源，无外部 CDN 依赖，支持内网/离线环境使用
 - **一键清理**：批量删除旧版本，保留最新
 - **智能转移**：参考已有路径或 AI 建议新路径
-- **AI Agent 技能**：提取了独立的 `manage-software` Skill（见 `SoftwareOrganizer-Skill/`），全面兼容 OpenClaw / Claude Code 调用。
+- **AI Agent 技能**：提供独立的 `manage-software` Skill（见 `SoftwareOrganizer-Skill/`），可供支持本地 Skill 的 Agent 工作流调用。
 
 ## 本项目解决的问题
 

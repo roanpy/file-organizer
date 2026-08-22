@@ -6923,12 +6923,31 @@ label {
     padding: 24px 32px !important;
 }
 
+#settings-modal .modal-body {
+    min-height: 0;
+}
+
+#settings-modal .tab-content {
+    height: auto;
+    overflow: visible;
+}
+
 #settings-modal .modal-footer,
 #batch-review-modal .modal-footer {
     min-height: 72px;
     padding: 12px 32px !important;
-    background: rgba(15, 23, 42, 0.72);
     border-top: 1px solid var(--glass-border);
+}
+
+#settings-modal .modal-footer {
+    min-height: 64px;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+#batch-review-modal .modal-footer {
+    background: rgba(15, 23, 42, 0.72);
 }
 
 #batch-review-modal .modal-body {
@@ -6977,6 +6996,34 @@ label {
     gap: 12px;
 }
 
+@media (max-width: 1050px) {
+    .glass-header {
+        padding: 0 12px;
+    }
+
+    .glass-header .actions {
+        gap: 6px;
+    }
+
+    #analyze-btn,
+    #dedupe-btn,
+    #process-btn {
+        width: 36px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    #analyze-btn span,
+    #dedupe-btn span,
+    #process-btn span {
+        display: none;
+    }
+
+    .ai-toggle-btn {
+        margin-right: 4px;
+    }
+}
+
 @media (max-width: 900px) {
     #settings-modal .modal-content,
     #batch-review-modal .modal-content {
@@ -6995,5 +7042,29 @@ label {
     #batch-review-modal .modal-footer {
         padding-left: 16px !important;
         padding-right: 16px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #settings-modal .settings-tabs {
+        overflow-x: auto;
+    }
+
+    #settings-modal .tab-btn {
+        flex: 0 0 auto;
+    }
+
+    #settings-modal .category-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+    }
+
+    #settings-modal .category-info {
+        grid-column: 1 / -1;
+    }
+
+    #settings-modal .category-formats {
+        min-width: 0;
     }
 }

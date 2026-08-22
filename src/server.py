@@ -48,7 +48,7 @@ from software_organizer.transfer import batch_move, batch_delete
 from software_organizer.database import get_db
 
 # Create FastAPI application
-app = FastAPI(title="File Organizer API", version="1.5.2")
+app = FastAPI(title="File Organizer API", version="1.5.3")
 
 def get_static_dir() -> str:
     """Get the static files directory."""

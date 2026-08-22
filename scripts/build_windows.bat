@@ -4,7 +4,7 @@ REM ==========================================
 REM      File Organizer - Windows Build
 REM ==========================================
 REM
-REM Version: 1.5.2 (2026-08-13)
+REM Version: 1.5.3 (2026-08-22)
 REM Function: Build standalone Windows application (.exe)
 REM
 REM Usage:
