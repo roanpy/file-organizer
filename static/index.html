@@ -7,7 +7,7 @@
     <title>File Organizer Pro</title>
     <!-- Local Fonts & Icons -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="/static/style.css?v=16">
+    <link rel="stylesheet" href="/static/style.css?v=17">
     <link rel="stylesheet" href="/static/ai_styles.css">
     <link rel="icon" type="image/png" href="/static/favicon.png">
 </head>
@@ -29,13 +29,16 @@
                     </div>
                 </div>
 
-                <button id="analyze-btn" class="btn-primary-style" onclick="inputManagement()">
+                <button id="analyze-btn" class="btn-primary-style has-tooltip" onclick="inputManagement()"
+                    data-tooltip="文件入库扫描" aria-label="文件入库扫描">
                     <i class="fa-solid fa-inbox"></i> <span>文件入库扫描</span>
                 </button>
-                <button id="dedupe-btn" class="btn-warning-style" onclick="deduplicateFiles()">
+                <button id="dedupe-btn" class="btn-warning-style has-tooltip" onclick="deduplicateFiles()"
+                    data-tooltip="生成清理计划" aria-label="生成清理计划">
                     <i class="fa-solid fa-broom"></i> <span>生成清理计划</span>
                 </button>
-                <button id="process-btn" class="btn-success-style" onclick="batchProcess()">
+                <button id="process-btn" class="btn-success-style has-tooltip" onclick="batchProcess()"
+                    data-tooltip="批量入库整理" aria-label="批量入库整理">
                     <i class="fa-solid fa-play"></i> <span>批量入库整理</span>
                 </button>
 

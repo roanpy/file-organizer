@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.3] - 2026-08-22
+
+### Fixed
+- Settings content now scrolls above an integrated footer, keeping the final directory row and save action visible in shorter windows.
+- Narrow desktop windows keep all header tools accessible; compact file-format settings preserve usable inputs and scrollable tabs.
+
 ## [1.5.2] - 2026-08-13
 
 ### Changed
