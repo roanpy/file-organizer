@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- AI relation results are now constrained to the same product boundary, preventing separate products from one vendor or suite from becoming replacement or cleanup candidates.
+- Path-specific keep decisions now override legacy name-wide rules, and new per-file choices no longer create rules that affect every version with the same product name.
+- The desktop window now keeps a tested `900 x 600` minimum size so toolbar and modal controls remain reachable.
+
+### Security
+- Local configuration responses now use a fixed credential mask and recursively remove token and private-key fields without exposing any stored credential characters.
+- The macOS build script now explicitly requires signing and notarization before public distribution.
+
 ## [1.5.3] - 2026-08-22
 
 ### Fixed

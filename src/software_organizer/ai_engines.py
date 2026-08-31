@@ -625,7 +625,7 @@ def analyze_software_relation(
         else "(Empty)"
     )
 
-    prompt = f"""Analyze the software list to identify different versions of the same software or products from the same series.
+    prompt = f"""Analyze the software list to identify different versions of the exact same product.
 
 ## Source Files (Pending processing):
 {source_info}
@@ -634,8 +634,8 @@ def analyze_software_relation(
 {target_info}
 
 ## Tasks
-1. Identify correlations between source and target files representing the **same software** or **series**.
-2. Examples: ON1.Effects and ON1.Photo.RAW are in the same series; 4K.Video.Downloader and 4K.YouTube.to.MP3 are in the same series.
+1. Match only the **same product** with naming or packaging differences.
+2. Never group separate products from the same vendor or series. For example, ON1 Effects is not ON1 Photo RAW, and 4K Video Downloader is not 4K YouTube to MP3.
 
 ## Output (JSON)
 {{

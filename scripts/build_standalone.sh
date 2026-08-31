@@ -107,7 +107,7 @@ if [ -d "dist/FileOrganizer.app" ]; then
     echo "📝 Next steps:"
     echo "1. Test application: open dist/FileOrganizer.app"
     echo "2. Verify scanning, matching, and transfer"
-    echo "3. If everything works, you can distribute the .app file"
+    echo "3. Sign and notarize the app before any public distribution"
     echo "=========================================="
 else
     echo ""

@@ -85,7 +85,7 @@ Open the URL printed by the script. The default port is `18001`; the launcher re
 
 Runtime state stays on the local machine under `~/.software_organizer/` for compatibility with existing installations. This includes paths, history, retention rules, the SQLite database, logs, and optional provider credentials. These files are private runtime data and must never be committed or attached to public issues.
 
-Provider keys are stored locally, masked in API responses, and never included in the source tree. AI is disabled by default. See [SECURITY.md](SECURITY.md) for reporting guidance and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for bundled and runtime licenses.
+Provider keys are stored locally; API responses expose only a configured flag and a fixed `****` display mask, never credential characters. Keys are never included in the source tree. AI is disabled by default. See [SECURITY.md](SECURITY.md) for reporting guidance and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for bundled and runtime licenses.
 
 ## Development
 

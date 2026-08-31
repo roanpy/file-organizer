@@ -90,7 +90,7 @@ def save_keep_rule(
     Args:
         file_path: File path (used as unique identifier).
         keep: Whether to keep the file.
-        software_name: Software name (optional, for backward compatibility).
+        software_name: Deprecated compatibility argument; no new name-wide rule is written.
 
     Returns:
         bool: True if successful.
@@ -100,10 +100,6 @@ def save_keep_rule(
     # Use file path as the key
     # Note: Save False instead of deleting, to distinguish "not kept" from "not set"
     rules[file_path] = keep
-    # Save software name if provided (for backward compatibility)
-    if software_name:
-        rules[software_name] = keep
-
     try:
         write_json_file(KEEP_RULES_FILE, rules)
 
@@ -143,6 +139,15 @@ def has_keep_rule(identifier: str) -> bool:
     """
     rules = load_keep_rules()
     return identifier in rules
+
+
+def get_keep_decision(*identifiers: Optional[str]) -> Optional[bool]:
+    """Return the first explicit keep decision, allowing path rules to win."""
+    rules = load_keep_rules()
+    for identifier in identifiers:
+        if identifier and identifier in rules:
+            return bool(rules[identifier])
+    return None
 
 
 # ==============================================================================

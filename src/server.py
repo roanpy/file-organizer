@@ -65,12 +65,8 @@ def _version_key(value: Optional[str]) -> tuple:
 
 
 def _mask_secret(value: str) -> str:
-    """Return a short display-only mask for stored credentials."""
-    if not value:
-        return ""
-    if len(value) <= 8:
-        return "****"
-    return f"{value[:4]}...{value[-4:]}"
+    """Return a display-only mask without exposing any credential characters."""
+    return "****" if value else ""
 
 
 def _is_masked_or_empty_secret(value: Any) -> bool:
@@ -81,12 +77,18 @@ def _is_masked_or_empty_secret(value: Any) -> bool:
 
 
 _SENSITIVE_CONFIG_KEYS = {
+    "access_token",
     "api_key",
     "api_token",
     "client_secret",
     "password",
+    "private_key",
+    "refresh_token",
     "secret",
     "token",
+}
+_NORMALIZED_SENSITIVE_CONFIG_KEYS = {
+    re.sub(r"[^a-z0-9]", "", key) for key in _SENSITIVE_CONFIG_KEYS
 }
 
 
@@ -96,7 +98,8 @@ def _redact_sensitive_config(value: Any) -> Any:
         return {
             key: _redact_sensitive_config(item)
             for key, item in value.items()
-            if key.lower() not in _SENSITIVE_CONFIG_KEYS
+            if re.sub(r"[^a-z0-9]", "", key.lower())
+            not in _NORMALIZED_SENSITIVE_CONFIG_KEYS
         }
     if isinstance(value, list):
         return [_redact_sensitive_config(item) for item in value]
@@ -109,7 +112,7 @@ def _redact_provider_config(config: Dict[str, Any]) -> Dict[str, Any]:
     public_config["configured"] = bool(api_key)
     if api_key:
         public_config["api_key_masked"] = _mask_secret(str(api_key))
-    return public_config
+    return _redact_sensitive_config(public_config)
 
 
 def _public_config(config: Dict[str, Any]) -> Dict[str, Any]:
@@ -130,7 +133,7 @@ def _public_config(config: Dict[str, Any]) -> Dict[str, Any]:
             for name, provider_config in custom_providers.items()
         }
 
-    return public_config
+    return _redact_sensitive_config(public_config)
 
 
 def _merge_secret_config(
@@ -338,6 +341,19 @@ def _resolve_ai_refs(refs: List[str], items: List[Dict[str, Any]]) -> List[Dict[
             used_paths.add(exact.get("path"))
 
     return resolved
+
+
+def _same_product_candidate(source: Dict[str, Any], target: Dict[str, Any]) -> bool:
+    """Keep AI relation suggestions inside the same conservative product boundary."""
+    return (
+        artifact_variant(source.get("filename", ""))
+        == artifact_variant(target.get("filename", ""))
+        and software_name_similarity(
+            source.get("name") or source.get("filename", ""),
+            target.get("name") or target.get("filename", ""),
+        )
+        >= 0.86
+    )
 
 
 def _apply_keep_recommendations(groups: List[Dict[str, Any]]) -> None:
@@ -838,7 +854,7 @@ def analyze_software(request: AnalyzeRequest):
         get_unconfigured_categories,
         find_target_matches,
     )
-    from software_organizer.persistence import is_kept
+    from software_organizer.persistence import get_keep_decision
 
     config = load_config()
     categories = get_categories()
@@ -861,10 +877,8 @@ def analyze_software(request: AnalyzeRequest):
 
         # 检查该文件是否被标记为保留
         # 优先使用 path (新版规则), 其次使用 name/filename (兼容旧版)
-        t["is_kept"] = (
-            is_kept(t["path"])
-            or is_kept(t.get("filename", ""))
-            or is_kept(t.get("name", ""))
+        t["is_kept"] = bool(
+            get_keep_decision(t["path"], t.get("filename"), t.get("name"))
         )
 
     # 为源软件添加增强信息：匹配项、推荐路径、Keep状态
@@ -892,7 +906,7 @@ def analyze_software(request: AnalyzeRequest):
 
         # 2. 检查 Keep 状态
         # 优先使用 path (新版规则), 其次使用 name (兼容旧版)
-        s["is_kept"] = is_kept(s["path"]) or is_kept(s.get("name", ""))
+        s["is_kept"] = bool(get_keep_decision(s["path"], s.get("name")))
 
         # 3. 确定推荐路径
         # 逻辑：
@@ -994,14 +1008,21 @@ def analyze_software(request: AnalyzeRequest):
                     ]
                     target_refs = group.get("target_files") or []
                     source_objs = _resolve_ai_refs(source_refs, needs_ai_sources)
+                    if source_objs:
+                        anchor_source = source_objs[0]
+                        source_objs = [
+                            item
+                            for item in source_objs
+                            if _same_product_candidate(anchor_source, item)
+                        ]
                     target_objs = _resolve_ai_refs(target_refs, target_software)
-                    source_variants = {
-                        artifact_variant(item.get("filename", "")) for item in source_objs
-                    }
                     target_objs = [
                         item
                         for item in target_objs
-                        if artifact_variant(item.get("filename", "")) in source_variants
+                        if any(
+                            _same_product_candidate(source, item)
+                            for source in source_objs
+                        )
                     ]
 
                     # A group without target files still needs path suggestion below.
@@ -1308,8 +1329,7 @@ def analyze_duplicates():
     from software_organizer.ai_engines import group_software_by_name
     from software_organizer.persistence import (
         annotate_duplicate_retention,
-        is_kept,
-        has_keep_rule,
+        get_keep_decision,
     )
 
     categories = get_categories()
@@ -1353,15 +1373,8 @@ def analyze_duplicates():
 
                     # 手动 Keep 规则优先，其次结构化保留策略。
                     # 硬保护策略（永不清理/目录排除/关键词排除）不能被默认清理覆盖。
-                    manual_keep = None
-                    if has_keep_rule(item["path"]):
-                        item["has_keep_rule"] = True
-                        manual_keep = is_kept(item["path"])
-                    elif has_keep_rule(item["filename"]):
-                        item["has_keep_rule"] = True
-                        manual_keep = is_kept(item["filename"])
-                    else:
-                        item["has_keep_rule"] = False
+                    manual_keep = get_keep_decision(item["path"], item["filename"])
+                    item["has_keep_rule"] = manual_keep is not None
                     item["manual_keep"] = manual_keep
 
                     if item.get("retention_protected"):

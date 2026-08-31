@@ -138,6 +138,26 @@ class RetentionRulesTest(unittest.TestCase):
         self.assertFalse(items[2]["recommended_keep"])
         self.assertEqual(summary["protected_count"], 1)
 
+    def test_path_keep_rule_overrides_legacy_name_rule(self):
+        persistence._keep_rules_cache = {
+            "Example App": True,
+            "/target/Example App 1.dmg": False,
+        }
+
+        decision = persistence.get_keep_decision(
+            "/target/Example App 1.dmg", "Example App"
+        )
+
+        self.assertFalse(decision)
+
+    def test_new_keep_rule_does_not_expand_to_every_version_name(self):
+        path = "/target/Example App 2.dmg"
+        self.assertTrue(persistence.save_keep_rule(path, True, "Example App"))
+
+        rules = persistence.load_keep_rules()
+        self.assertTrue(rules[path])
+        self.assertNotIn("Example App", rules)
+
 
 if __name__ == "__main__":
     unittest.main()

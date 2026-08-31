@@ -27,9 +27,34 @@ class ConfigSecurityTest(unittest.TestCase):
         self.assertTrue(public_config["gemini"]["configured"])
         self.assertTrue(public_config["deepseek"]["configured"])
         self.assertTrue(public_config["custom_providers"]["demo"]["configured"])
-        self.assertIn("api_key_masked", public_config["gemini"])
+        self.assertEqual(public_config["gemini"]["api_key_masked"], "****")
+        serialized = str(public_config)
+        self.assertNotIn("example-gemini-secret", serialized)
+        self.assertNotIn("example-deepseek-secret", serialized)
+        self.assertNotIn("custom-secret-value", serialized)
         self.assertIn("configured", public_config["gemini"])
         self.assertIn("configured", public_config["deepseek"])
+
+    def test_public_config_recursively_removes_other_secret_fields(self):
+        public_config = server._public_config(
+            {
+                "gemini": {"api_key": "example-secret"},
+                "custom_providers": {
+                    "demo": {
+                        "access_token": "access-secret",
+                        "apiKey": "camel-case-secret",
+                        "nested": {"private_key": "private-secret"},
+                    }
+                },
+                "client_secret": "top-level-secret",
+            }
+        )
+
+        provider = public_config["custom_providers"]["demo"]
+        self.assertNotIn("client_secret", public_config)
+        self.assertNotIn("access_token", provider)
+        self.assertNotIn("apiKey", provider)
+        self.assertNotIn("private_key", provider["nested"])
 
     def test_public_config_keeps_configured_false_without_api_key(self):
         public_config = server._public_config(

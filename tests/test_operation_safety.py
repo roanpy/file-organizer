@@ -41,6 +41,29 @@ class OperationSafetyTest(unittest.TestCase):
                 server._resolve_suggested_directory(outside, [candidate], managed)
             )
 
+    def test_ai_relations_cannot_merge_separate_products(self):
+        source = {
+            "name": "4K Video Downloader+",
+            "filename": "4K.Video.Downloader+.v26.1.5.dmg",
+        }
+        same_product = {
+            "name": "4K.Video.Downloader+",
+            "filename": "4K Video Downloader+ 25.0.dmg",
+        }
+        other_product = {
+            "name": "4K YouTube to MP3",
+            "filename": "4K.YouTube.to.MP3.v26.1.5.dmg",
+        }
+
+        self.assertTrue(server._same_product_candidate(source, same_product))
+        self.assertFalse(server._same_product_candidate(source, other_product))
+        self.assertFalse(
+            server._same_product_candidate(
+                {"name": "open-codesign", "filename": "open-codesign-0.2.1.dmg"},
+                {"name": "open-design", "filename": "open-design-0.8.0.dmg"},
+            )
+        )
+
     def test_config_endpoint_rejects_invalid_category_ids(self):
         request = server.ConfigUpdate(
             categories={'bad" onclick="alert(1)': {"name": "Unsafe"}}
